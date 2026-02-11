@@ -1,20 +1,51 @@
+// server.js (API para Render / Railway)
+// - GET /health
+// - GET /search?q=...&sites=dom1,dom2
+//
+// Recomendado: usar esse server separado do GitHub Pages (Pages = front estático)
+
 import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
+import cors from "cors";
 
 const app = express();
 app.use(express.json({ limit: "1mb" }));
 
-// --- resolve paths (ESM) ---
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// ============================
+// ✅ CORS (GitHub Pages + local)
+// ============================
+const ALLOWED_ORIGINS = new Set([
+  "https://lbarbosadeveloper.github.io", // seu GitHub Pages (domínio)
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "http://localhost:5500",
+  "http://127.0.0.1:5500",
+]);
 
-// ✅ Aqui é onde ficam index.html / app.js / styles.css / assets/
-const PUBLIC_DIR = path.join(__dirname, "../public");
-app.use(express.static(PUBLIC_DIR));
+app.use(
+  cors({
+    origin(origin, cb) {
+      // requests sem origin (curl/postman) passam
+      if (!origin) return cb(null, true);
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(PUBLIC_DIR, "index.html"));
+      // libera o domínio do pages + variações de porta (local)
+      if (ALLOWED_ORIGINS.has(origin)) return cb(null, true);
+
+      // opcional: liberar qualquer subpath do github.io (origin vem só domínio)
+      // se quiser liberar qualquer usuário no github.io, use:
+      // if (origin.endsWith(".github.io")) return cb(null, true);
+
+      return cb(new Error("CORS bloqueado: " + origin));
+    },
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"],
+  })
+);
+
+// ============================
+// Health check (pra testar no browser)
+// ============================
+app.get("/health", (req, res) => {
+  res.json({ ok: true, uptime: process.uptime() });
 });
 
 // ============================
@@ -32,9 +63,7 @@ function decodeEntities(str = "") {
     .replaceAll("&nbsp;", " ");
 
   s = s.replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
-  s = s.replace(/&#x([0-9a-fA-F]+);/g, (_, hex) =>
-    String.fromCharCode(parseInt(hex, 16))
-  );
+  s = s.replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
 
   return s;
 }
@@ -55,10 +84,7 @@ function pickTag(block, tag) {
 }
 
 function pickAttrTag(block, tag, attrName) {
-  const re = new RegExp(
-    `<${tag}\\b[^>]*${attrName}="([^"]+)"[^>]*>([\\s\\S]*?)<\\/${tag}>`,
-    "i"
-  );
+  const re = new RegExp(`<${tag}\\b[^>]*${attrName}="([^"]+)"[^>]*>([\\s\\S]*?)<\\/${tag}>`, "i");
   const m = block.match(re);
   if (!m) return null;
   return { attr: m[1]?.trim() || "", text: (m[2] || "").trim() };
@@ -102,12 +128,12 @@ function parseRss(xmlText = "") {
 
     items.push({
       title,
-      url: link, // quase sempre news.google.com
+      url: link, // muitas vezes news.google.com
       snippet,
       source: sourceName || (sourceUrl ? sourceUrl : ""),
       publishedAt,
-      publisherUrl: "",        // vamos preencher por redirect
-      publisherDomain: "",     // idem
+      publisherUrl: "",
+      publisherDomain: "",
     });
   }
 
@@ -125,6 +151,7 @@ function normalizeDomainList(raw) {
         .replace(/^https?:\/\//i, "")
         .replace(/^www\./i, "")
         .replace(/\/.*$/, "")
+        .toLowerCase()
     );
 }
 
@@ -151,7 +178,6 @@ function isGoogleHost(host) {
 }
 
 async function resolvePublisherFromGoogleNewsUrl(gnUrl, timeoutMs = 4500) {
-  // segue redirect e devolve a URL final
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -160,16 +186,14 @@ async function resolvePublisherFromGoogleNewsUrl(gnUrl, timeoutMs = 4500) {
       redirect: "follow",
       signal: controller.signal,
       headers: {
-        "User-Agent": "Mozilla/5.0 (RadarOperacionalLAMSA; +local)",
+        "User-Agent": "Mozilla/5.0 (RadarOperacional; Node)",
         Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
       },
     });
 
-    // em fetch, r.url vira a URL final após redirect
     const finalUrl = r.url || "";
     const host = getHostSafe(finalUrl);
 
-    // se ainda for Google/GoogleNews, não serve
     if (!finalUrl) return { publisherUrl: "", publisherDomain: "" };
     if (isGoogleNewsHost(host) || isGoogleHost(host)) return { publisherUrl: "", publisherDomain: "" };
 
@@ -215,7 +239,7 @@ app.get("/search", async (req, res) => {
 
     const r = await fetch(rssUrl, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (RadarOperacionalLAMSA; +local)",
+        "User-Agent": "Mozilla/5.0 (RadarOperacional; RSS)",
         Accept: "application/rss+xml,text/xml;q=0.9,*/*;q=0.8",
       },
     });
@@ -226,18 +250,15 @@ app.get("/search", async (req, res) => {
     }
 
     const xml = await r.text();
-    const items = parseRss(xml)
-      .filter((it) => it.url && it.title)
-      .slice(0, 10);
+    const items = parseRss(xml).filter((it) => it.url && it.title).slice(0, 10);
 
-    // ✅ Agora enriquece: resolve publisherUrl/publisherDomain via redirect
+    // Enriquecer publisherUrl/publisherDomain
     const enriched = await mapPool(items, 3, async (it) => {
       const host = getHostSafe(it.url);
       if (isGoogleNewsHost(host)) {
         const resolved = await resolvePublisherFromGoogleNewsUrl(it.url);
         return { ...it, ...resolved };
       }
-      // se já for site real, usa ele mesmo
       return { ...it, publisherUrl: it.url, publisherDomain: getHostSafe(it.url) };
     });
 
@@ -258,11 +279,12 @@ app.get("/search", async (req, res) => {
   }
 });
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(PUBLIC_DIR, "index.html"));
+// Root opcional
+app.get("/", (req, res) => {
+  res.send("Radar Operacional API ok. Use /health e /search.");
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Online em http://localhost:${PORT}`);
+  console.log(`API online na porta ${PORT}`);
 });
