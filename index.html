@@ -6,6 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Radar Operacional Lamsa</title>
   <link rel="stylesheet" href="styles.css" />
+
+  <!-- ✅ Google Maps API Key (recomendado) -->
+  <!-- Troque SUA_KEY_AQUI pela sua chave -->
+  <meta name="google-maps-key" content="SUA_KEY_AQUI" />
 </head>
 <body>
 
@@ -14,14 +18,14 @@
     <div class="topbar-inner">
       <div class="topbar-left">
         <img
-  src="./assets/lamsa-logo.png"
-  alt="LAMSA"
-  id="lamsaLogo"
-  class="lamsaLogo logo-pulse"
-  role="button"
-  tabindex="0"
-  title="Atualizar página"
-/>
+          src="./assets/lamsa-logo.png"
+          alt="LAMSA"
+          id="lamsaLogo"
+          class="lamsaLogo logo-pulse"
+          role="button"
+          tabindex="0"
+          title="Atualizar página"
+        />
         <span class="appTitle">Radar Operacional LAMSA</span>
       </div>
 
@@ -109,6 +113,18 @@
                 <div class="wValue" id="wUpdated">—</div>
               </div>
             </div>
+          </div>
+        </section>
+
+        <!-- ✅ MAPA (GOOGLE MAPS DARK) -->
+        <section class="panel mapPanel">
+          <div class="panelHead">
+            <h2>Mapa</h2>
+          </div>
+
+          <div class="mapWrap">
+            <!-- o JS inicializa aqui -->
+            <div id="map" class="mapEl" aria-label="Mapa"></div>
           </div>
         </section>
 
