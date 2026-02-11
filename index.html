@@ -1,0 +1,144 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Radar Operacional Lamsa</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- HEADER FULL WIDTH -->
+  <header class="topbar full">
+    <div class="topbar-inner">
+      <div class="topbar-left">
+        <img
+  src="./assets/lamsa-logo.png"
+  alt="LAMSA"
+  id="lamsaLogo"
+  class="lamsaLogo logo-pulse"
+  role="button"
+  tabindex="0"
+  title="Atualizar página"
+/>
+        <span class="appTitle">Radar Operacional LAMSA</span>
+      </div>
+
+      <div class="topbar-right">
+        <div class="pill">
+          <span class="dot"></span>
+          <span id="statusText">idle</span>
+        </div>
+        <div class="clock" id="clock">--:--:--</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTEÚDO -->
+  <main class="wrap">
+    <section class="gridMain">
+
+      <!-- LINHA DE CIMA -->
+      <section class="topRow">
+
+        <!-- PALAVRAS-CHAVE (EDITÁVEL) -->
+        <section class="panel keywordsPanel">
+          <section class="kw-panel">
+            <div class="kw-head">
+              <h2>Buscas</h2>
+              <div class="kw-actions">
+                <button id="kwClear" class="btn ghost" type="button" title="Limpar tudo">Limpar</button>
+                <button id="kwReset" class="btn ghost" type="button" title="Voltar ao padrão">Padrão</button>
+              </div>
+            </div>
+
+            <div class="kw-inputRow">
+              <div class="kw-inputWrap">
+                <span class="kw-icon">⌕</span>
+                <input
+                  id="kwInput"
+                  class="kw-input"
+                  type="text"
+                  placeholder="Digite e dê Enter (ou cole várias separadas por vírgula)"
+                  autocomplete="off"
+                />
+              </div>
+              <button id="kwAdd" class="btn primary" type="button">+ Adicionar</button>
+            </div>
+
+            <div id="kwChips" class="kw-chips" aria-label="Lista de palavras-chave"></div>
+
+            <div class="kw-foot">
+              <small id="kwCount" class="kw-count">0 palavras-chave</small>
+              <button id="kwCopy" class="btn ghost" type="button">Copiar lista</button>
+            </div>
+          </section>
+        </section>
+
+        <!-- CLIMA -->
+        <section class="panel weatherPanel">
+          <div class="panelHead">
+            <h2>Clima</h2>
+          </div>
+
+          <div class="weather">
+            <div class="weatherTop">
+              <div class="temp" id="wTemp">--°</div>
+              <div class="place">
+                <div class="placeTitle" id="wPlace">Carregando...</div>
+                <div class="placeSub" id="wCond">—</div>
+              </div>
+            </div>
+
+            <div class="weatherGrid">
+              <div class="wCard">
+                <div class="wLabel">Vento</div>
+                <div class="wValue" id="wWind">—</div>
+              </div>
+              <div class="wCard">
+                <div class="wLabel">Umidade</div>
+                <div class="wValue" id="wHum">—</div>
+              </div>
+              <div class="wCard">
+                <div class="wLabel">Sensação</div>
+                <div class="wValue" id="wFeels">—</div>
+              </div>
+              <div class="wCard">
+                <div class="wLabel">Atualizado</div>
+                <div class="wValue" id="wUpdated">—</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </section>
+
+      <!-- RESULTADOS -->
+      <section class="panel resultsPanel">
+        <div class="panelHead resultsHead">
+          <div>
+            <h2>Resultados</h2>
+            <p></p>
+            <small class="hintSmall"></small>
+          </div>
+        </div>
+
+        <!-- Carrossel -->
+        <div class="carousel" id="carousel">
+          <button class="car-btn prev" id="prevBtn" aria-label="Anterior">‹</button>
+
+          <div class="car-viewport">
+            <div class="results" id="results"></div>
+          </div>
+
+          <button class="car-btn next" id="nextBtn" aria-label="Próximo">›</button>
+        </div>
+      </section>
+
+    </section>
+  </main>
+
+  <script src="./app.js"></script>
+</body>
+</html>
