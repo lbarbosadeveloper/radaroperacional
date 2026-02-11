@@ -42,6 +42,18 @@ const BLOCKLIST_HOSTS = ["wikipedia.org", "lamsa.com.br"];
 const BLOCKLIST_PATH_CONTAINS = [];
 
 // ============================
+// ✅ API_BASE (local vs GitHub Pages)
+// - Local: usa http://localhost:3000
+// - Produção: usa o backend publicado (Render/Railway/etc)
+// ============================
+const PROD_API = "https://SEU-BACKEND.onrender.com"; // <- TROQUE AQUI
+
+const API_BASE =
+  (location.hostname === "localhost" || location.hostname === "127.0.0.1")
+    ? "http://localhost:3000"
+    : PROD_API;
+
+// ============================
 // Utils
 // ============================
 function sleep(ms) {
@@ -522,8 +534,14 @@ document.addEventListener("DOMContentLoaded", () => {
   async function searchWeb(keyword) {
     const date = todayISO();
     const sites = SITE_FILTER.length ? `&sites=${encodeURIComponent(SITE_FILTER.join(","))}` : "";
-    const res = await fetch(`/search?q=${encodeURIComponent(keyword)}&date=${encodeURIComponent(date)}${sites}`);
-    if (!res.ok) throw new Error(`Erro HTTP ${res.status}`);
+    const url = `${API_BASE}/search?q=${encodeURIComponent(keyword)}&date=${encodeURIComponent(date)}${sites}`;
+
+    const res = await fetch(url);
+    if (!res.ok) {
+      const txt = await res.text().catch(() => "");
+      console.warn("Falha /search:", res.status, txt.slice(0, 200));
+      throw new Error(`Erro HTTP ${res.status}`);
+    }
     return res.json();
   }
 
