@@ -46,7 +46,7 @@ const BLOCKLIST_PATH_CONTAINS = [];
 // - Local: usa http://localhost:3000
 // - Produção: usa o backend publicado (Render/Railway/etc)
 // ============================
-const PROD_API = "https://SEU-BACKEND.onrender.com"; // <- TROQUE AQUI
+const PROD_API = "https://lbarbosadeveloper.github.io/radaroperacional/"; // <- TROQUE AQUI
 
 const API_BASE =
   (location.hostname === "localhost" || location.hostname === "127.0.0.1")
