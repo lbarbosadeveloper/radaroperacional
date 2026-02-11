@@ -49,9 +49,142 @@ const BLOCKLIST_PATH_CONTAINS = [];
 const PROD_API = "https://radaroperacional-api.onrender.com"; // <- TROQUE AQUI
 
 const API_BASE =
-  (location.hostname === "localhost" || location.hostname === "127.0.0.1")
-    ? "http://localhost:3000"
-    : PROD_API;
+  location.hostname === "localhost" || location.hostname === "127.0.0.1" ? "http://localhost:3000" : PROD_API;
+
+// ============================
+// ✅ GOOGLE MAPS (Dark) — apenas front
+// 👉 Requisitos no HTML:
+//   1) ter um container: <div id="map"></div> (no seu card da direita)
+//   2) colocar sua key em UMA destas formas:
+//      - <meta name="google-maps-key" content="SUA_KEY_AQUI">
+//      - ou: window.GOOGLE_MAPS_KEY = "SUA_KEY_AQUI" (antes do app.js)
+// ============================
+const MAPS = {
+  enabled: true,
+  elementId: "map", // id do container do mapa
+  center: { lat: -22.8749, lng: -43.3096 }, // Água Santa (mesmo ponto do clima)
+  zoom: 14,
+};
+
+let __gmapsLoaded = false;
+let __gmapsLoading = null;
+let __mapInstance = null;
+
+function getGoogleMapsKey() {
+  // opção 1: meta tag
+  const meta = document.querySelector('meta[name="google-maps-key"]');
+  const fromMeta = meta?.getAttribute("content")?.trim();
+  if (fromMeta) return fromMeta;
+
+  // opção 2: global
+  const fromGlobal = String(window.GOOGLE_MAPS_KEY || "").trim();
+  if (fromGlobal) return fromGlobal;
+
+  return "";
+}
+
+function loadGoogleMapsScript(key) {
+  if (__gmapsLoaded) return Promise.resolve();
+  if (__gmapsLoading) return __gmapsLoading;
+
+  __gmapsLoading = new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.async = true;
+    s.defer = true;
+
+    // callback global obrigatório pra API
+    window.__initMapCallback = () => {
+      __gmapsLoaded = true;
+      resolve();
+    };
+
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&callback=__initMapCallback`;
+    s.onerror = () => reject(new Error("Falha ao carregar Google Maps API."));
+    document.head.appendChild(s);
+  });
+
+  return __gmapsLoading;
+}
+
+function getDarkMapStyle() {
+  // estilo dark “clean” (pode refinar depois)
+  return [
+    { elementType: "geometry", stylers: [{ color: "#0b1220" }] },
+    { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
+    { elementType: "labels.text.fill", stylers: [{ color: "#b9d2ea" }] },
+    { elementType: "labels.text.stroke", stylers: [{ color: "#0b1220" }] },
+    { featureType: "administrative", elementType: "geometry", stylers: [{ color: "#22324c" }] },
+    { featureType: "poi", elementType: "geometry", stylers: [{ color: "#0e1a2f" }] },
+    { featureType: "poi", elementType: "labels.text.fill", stylers: [{ color: "#89a8c6" }] },
+    { featureType: "road", elementType: "geometry", stylers: [{ color: "#18253a" }] },
+    { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#0b1220" }] },
+    { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#9fb3c8" }] },
+    { featureType: "transit", elementType: "geometry", stylers: [{ color: "#132136" }] },
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#07101a" }] },
+    { featureType: "water", elementType: "labels.text.fill", stylers: [{ color: "#7aa5c9" }] },
+  ];
+}
+
+async function initGoogleMapIfPossible() {
+  if (!MAPS.enabled) return;
+
+  const el = document.getElementById(MAPS.elementId);
+  if (!el) return; // se ainda não existe no HTML, não quebra nada
+
+  const key = getGoogleMapsKey();
+  if (!key) {
+    // não trava o app: só avisa no console e coloca um placeholder discreto
+    console.warn(
+      "[Maps] Sem Google Maps API key. Adicione <meta name='google-maps-key' content='SUA_KEY'> ou window.GOOGLE_MAPS_KEY."
+    );
+    if (!el.dataset.mapPlaceholder) {
+      el.dataset.mapPlaceholder = "1";
+      el.innerHTML = `<div style="
+        width:100%;height:100%;
+        display:flex;align-items:center;justify-content:center;
+        font: 500 12px system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        color: rgba(235,245,255,.65);
+        background: rgba(10,16,26,.55);
+        border: 1px solid rgba(170,220,255,.12);
+        border-radius: 16px;
+      ">Google Maps: falta configurar API KEY</div>`;
+    }
+    return;
+  }
+
+  await loadGoogleMapsScript(key);
+
+  // cria o mapa uma vez
+  if (!__mapInstance) {
+    // eslint-disable-next-line no-undef
+    __mapInstance = new google.maps.Map(el, {
+      center: MAPS.center,
+      zoom: MAPS.zoom,
+      styles: getDarkMapStyle(),
+      disableDefaultUI: true,
+      zoomControl: true,
+      gestureHandling: "greedy",
+      clickableIcons: false,
+    });
+
+    // marcador opcional no centro
+    // eslint-disable-next-line no-undef
+    new google.maps.Marker({
+      position: MAPS.center,
+      map: __mapInstance,
+      title: "Centro",
+    });
+  }
+
+  // garante resize quando o card aparece/ajusta
+  setTimeout(() => {
+    try {
+      // eslint-disable-next-line no-undef
+      google.maps.event.trigger(__mapInstance, "resize");
+      __mapInstance.setCenter(MAPS.center);
+    } catch {}
+  }, 150);
+}
 
 // ============================
 // Utils
@@ -94,8 +227,8 @@ function normalizeUrl(url) {
   try {
     const o = new URL(u);
     o.hostname = o.hostname.replace(/^www\./, "").toLowerCase();
-    ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "gclid", "fbclid", "igshid"].forEach(
-      (p) => o.searchParams.delete(p)
+    ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "gclid", "fbclid", "igshid"].forEach((p) =>
+      o.searchParams.delete(p)
     );
     o.hash = "";
     return o.toString();
@@ -207,10 +340,7 @@ function sourceToDomain(sourceText = "") {
 
 function faviconFromDomain(domain, sourceText, fallbackUrl) {
   const d =
-    String(domain || "").trim() ||
-    sourceToDomain(sourceText) ||
-    getHost(fallbackUrl) ||
-    "news.google.com";
+    String(domain || "").trim() || sourceToDomain(sourceText) || getHost(fallbackUrl) || "news.google.com";
 
   return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(d)}&sz=64`;
 }
@@ -493,8 +623,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const chip1 = escapeHtml(r.keyword || "Linha Amarela");
 
       // ✅ mostra fonte (G1, O Globo, Diário do Rio, R7, etc.)
-      const chip2Text =
-        String(r.source || "").trim() || (r.publisherDomain ? r.publisherDomain : "") || "Fonte";
+      const chip2Text = String(r.source || "").trim() || (r.publisherDomain ? r.publisherDomain : "") || "Fonte";
       const chip2 = escapeHtml(chip2Text);
 
       // ✅ favicon do publisherDomain; fallback por source; fallback por host do openUrl
@@ -659,6 +788,22 @@ document.addEventListener("DOMContentLoaded", () => {
   loadWeather();
   setInterval(loadWeather, 10 * 60 * 1000);
 
+  // ✅ inicia o mapa (se o #map existir)
+  initGoogleMapIfPossible();
+  // tenta de novo após 1s (caso seu layout injete o card depois)
+  setTimeout(initGoogleMapIfPossible, 1000);
+
   runScan();
   setInterval(runScan, 10 * 60 * 1000);
+
+  // ✅ se redimensionar a tela, tenta resize do mapa
+  window.addEventListener("resize", () => {
+    if (__mapInstance) {
+      try {
+        // eslint-disable-next-line no-undef
+        google.maps.event.trigger(__mapInstance, "resize");
+        __mapInstance.setCenter(MAPS.center);
+      } catch {}
+    }
+  });
 });
