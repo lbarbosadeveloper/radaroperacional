@@ -51,7 +51,7 @@ body{
 .lamsaLogo{ height:120px; }
 
 .appTitle{
-  font-size:18px;
+  font-size:50px;
   font-weight:800;
   letter-spacing:.04em;
 }
@@ -688,4 +688,5 @@ body{
   opacity:.8;
   font-size:12px;
 }
+
 
