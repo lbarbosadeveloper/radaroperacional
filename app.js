@@ -620,7 +620,17 @@ document.addEventListener("DOMContentLoaded", () => {
       // ✅ abre o publisherUrl quando existir (seu backend pode preencher)
       const openUrl = r.publisherUrl || r.url || "#";
 
-      const chip1 = escapeHtml(r.keyword || "Linha Amarela");
+      // ✅ (NOVO) suporta múltiplas keywords no mesmo card (sem quebrar o antigo)
+      const kws =
+        Array.isArray(r.keywords) && r.keywords.length
+          ? r.keywords
+          : [r.keyword || "Linha Amarela"];
+
+      const kwChipsHtml = kws
+        .filter(Boolean)
+        .slice(0, 4) // segurança visual (não poluir)
+        .map((k) => `<span class="chipCard">${escapeHtml(k)}</span>`)
+        .join("");
 
       // ✅ mostra fonte (G1, O Globo, Diário do Rio, R7, etc.)
       const chip2Text = String(r.source || "").trim() || (r.publisherDomain ? r.publisherDomain : "") || "Fonte";
@@ -636,7 +646,7 @@ document.addEventListener("DOMContentLoaded", () => {
       card.innerHTML = `
         <header class="news-top">
           <div class="news-chips">
-            <span class="chipCard">${chip1}</span>
+            ${kwChipsHtml}
 
             <span class="chipCard chipCard-url">
               <img class="chipIcon" src="${escapeHtml(iconSrc)}" alt="" loading="lazy" />
@@ -674,6 +684,14 @@ document.addEventListener("DOMContentLoaded", () => {
     return res.json();
   }
 
+  // ✅ (NOVO) contador por keyword considerando itens com keywords[] mescladas
+  function countItemsForKeyword(kw) {
+    return todayItems.filter((x) => {
+      const kws = Array.isArray(x.keywords) && x.keywords.length ? x.keywords : [x.keyword || "—"];
+      return kws.includes(kw);
+    }).length;
+  }
+
   function pushToday(item) {
     if (!withinHours(item, MAX_AGE_HOURS)) return;
 
@@ -681,11 +699,42 @@ document.addEventListener("DOMContentLoaded", () => {
     if (norm) item.url = norm;
 
     const key = makeDedupeKey(item);
-    if (todayItems.some((x) => makeDedupeKey(x) === key)) return;
 
+    // ✅ (NOVO) se já existe a mesma notícia, NÃO descarta:
+    // mescla keywords (isso evita “parece que só Avenida Brasil funciona”)
+    const existingIdx = todayItems.findIndex((x) => makeDedupeKey(x) === key);
+    if (existingIdx !== -1) {
+      const existing = todayItems[existingIdx];
+
+      const existingKws =
+        Array.isArray(existing.keywords) && existing.keywords.length
+          ? existing.keywords
+          : existing.keyword
+            ? [existing.keyword]
+            : [];
+
+      const kw = item.keyword || "—";
+      if (kw && !existingKws.includes(kw)) existingKws.push(kw);
+
+      existing.keywords = existingKws;
+
+      // mantém compatibilidade (se o item antigo tinha só `keyword`)
+      if (!existing.keyword && kw) existing.keyword = kw;
+
+      // se vierem dados melhores do backend, preenche sem apagar o que já tem
+      if (!existing.publisherUrl && item.publisherUrl) existing.publisherUrl = item.publisherUrl;
+      if (!existing.publisherDomain && item.publisherDomain) existing.publisherDomain = item.publisherDomain;
+
+      return;
+    }
+
+    // ✅ limite por keyword (agora considerando keywords[] no futuro)
     const kw = item.keyword || "—";
-    const kwCount = todayItems.filter((x) => (x.keyword || "—") === kw).length;
+    const kwCount = countItemsForKeyword(kw);
     if (kwCount >= MAX_RESULTS_PER_KEYWORD) return;
+
+    // garante estrutura nova sem quebrar a antiga
+    item.keywords = [kw];
 
     todayItems.unshift(item);
     if (todayItems.length > MAX_TODAY_ITEMS) todayItems.length = MAX_TODAY_ITEMS;
