@@ -37,7 +37,13 @@ const MAX_AGE_HOURS = 48;
 // ============================
 // Sites permitidos (vai pro backend /search)
 // ============================
-const SITE_FILTER = ["g1.globo.com", "oglobo.globo.com", "diariodorio.com", "r7.com"];
+const SITE_FILTER = ["g1.globo.com",
+  "oglobo.globo.com",
+  "diariodorio.com",
+  "r7.com",
+  "band.uol.com.br",
+  "cnnbrasil.com.br",
+  "odia.ig.com.br"];
 
 // ============================
 // ✅ BLOCKLIST
