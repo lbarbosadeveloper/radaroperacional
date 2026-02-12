@@ -20,7 +20,7 @@ body{
   color:var(--text);
 }
 
-html, body { min-height: 100vh; }
+html, body { min-height: 100vh; overflow-x: hidden; } /* ✅ evita “esticar” a tela */
 html { background: var(--bg); }
 
 /* HEADER */
@@ -34,7 +34,7 @@ html { background: var(--bg); }
 }
 
 .topbar-inner{
-  width: 98vw;              /* ✅ alinha com o corpo */
+  width: 98vw;
   margin:0 auto;
   display:flex;
   justify-content:space-between;
@@ -96,7 +96,7 @@ html { background: var(--bg); }
   grid-template-columns: 380px minmax(320px, 1fr) minmax(420px, 1fr);
   gap:16px;
 }
-.topRow > *{ min-width:0; }
+.topRow > *{ min-width:0; } /* ✅ evita “esticar” por conteúdo interno */
 
 /* PANELS */
 .panel{
@@ -138,6 +138,7 @@ html { background: var(--bg); }
   display:flex;
   flex-direction:column;
   gap:12px;
+  min-height: 320px; /* ✅ não “some” */
 }
 
 /* dá um "respiro" e garante altura consistente */
@@ -145,7 +146,7 @@ html { background: var(--bg); }
   position: relative;
   flex: 1 1 auto;
   height: 100%;
-  min-height: 260px; /* altura mínima pro mapa ficar lindo */
+  min-height: 260px;
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid rgba(170,220,255,.14);
@@ -168,8 +169,6 @@ html { background: var(--bg); }
   width:100%;
   height:100%;
   border:0;
-
-  /* dark "fake", mas fica bem bonito no seu UI */
   filter: invert(1) hue-rotate(180deg) contrast(1.05) saturate(.95);
 }
 
@@ -341,28 +340,32 @@ html { background: var(--bg); }
   position: relative;
   width: 100%;
   margin-top: 10px;
+  overflow: hidden; /* ✅ corta qualquer vazamento */
 }
 
-/* ✅ TIRA a trava de 1400px: agora vai até o canto */
+/* viewport ocupa tudo */
 .car-viewport{
   width: 100%;
   margin: 0;
   overflow: hidden;
   padding: 0 52px; /* espaço pros botões */
   max-width: none;
+  min-width: 0;
 }
 
-/* Track */
+/* Track — FIX definitivo do “esticando a tela” */
 #results{
-  display: flex;
+  display: inline-flex;     /* ✅ */
   gap: 16px;
   align-items: stretch;
   justify-content: flex-start;
   padding: 8px 4px 14px;
   flex-wrap: nowrap;
-  width: max-content;
+  width: fit-content;       /* ✅ substitui max-content */
+  max-width: 100%;          /* ✅ nunca passa do viewport */
   will-change: transform;
   transform: translate3d(0,0,0);
+  min-width: 0;
 }
 
 /* ✅ Agora os cards são news-card */
@@ -412,15 +415,15 @@ html { background: var(--bg); }
   flex-direction: column;
   gap: 8px;
   min-width: 0;
-  align-items: flex-start; /* ✅ evita chip esticar */
+  align-items: flex-start;
 }
 
 /* chips do card (tamanho do conteúdo) */
 .chipCard{
   display:inline-flex;
   align-items:center;
-  width: fit-content;     /* ✅ ajusta na largura do texto */
-  max-width: 100%;        /* ✅ mas não passa do card */
+  width: fit-content;
+  max-width: 100%;
   padding: 8px 12px;
   border-radius: 999px;
   border: 1px solid rgba(150,210,255,.14);
@@ -436,9 +439,9 @@ html { background: var(--bg); }
 .chipCard-url{
   display:inline-flex;
   align-items:center;
-  width: fit-content;     /* ✅ não ocupa a linha inteira */
+  width: fit-content;
   gap: 8px;
-  padding: 7px 10px;      /* ✅ deixa mais "justinho" */
+  padding: 7px 10px;
   color: rgba(235,245,255,.62);
 }
 
@@ -502,7 +505,7 @@ html { background: var(--bg); }
 
   display:-webkit-box;
   -webkit-box-orient:vertical;
-  -webkit-line-clamp:3;  /* ✅ 3 linhas */
+  -webkit-line-clamp:3;
   overflow:hidden;
 }
 
@@ -515,7 +518,7 @@ html { background: var(--bg); }
 
   display:-webkit-box;
   -webkit-box-orient:vertical;
-  -webkit-line-clamp:2;  /* ✅ 2 linhas */
+  -webkit-line-clamp:2;
   overflow:hidden;
 }
 
@@ -681,20 +684,3 @@ html { background: var(--bg); }
   opacity:.8;
   font-size:12px;
 }
-/* ✅ trava qualquer “empurrão” horizontal do carrossel */
-html, body { overflow-x: hidden; }
-
-/* ✅ garante que os itens do grid não estiquem por causa de conteúdo interno */
-.topRow > * { min-width: 0; }
-
-/* ✅ garante que o mapa não encolha/suma quando a página reflow */
-.mapPanel { min-height: 320px; }
-.mapWrap  { min-height: 260px; }
-
-/* ✅ garante que o viewport do carrossel realmente corta o track */
-.car-viewport { overflow: hidden; min-width: 0; max-width: none; margin: 0; width: 100%; }
-#results { min-width: 0; }
-html, body { overflow-x: hidden; }
-.car-viewport { max-width: none; margin: 0; width: 100%; }
-
-
