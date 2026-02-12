@@ -684,3 +684,5 @@ body{
   opacity:.8;
   font-size:12px;
 }
+html, body { min-height: 100vh; }
+html { background: var(--bg); }
