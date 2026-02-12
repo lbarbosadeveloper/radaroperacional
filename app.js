@@ -277,8 +277,15 @@ function makeDedupeKey(item) {
   const url = normalizeUrl(item?.url || "");
   const title = String(item?.title || "").trim().toLowerCase();
   const source = String(item?.source || "").trim().toLowerCase();
-  return url ? `U:${url}` : `TS:${source}__${title}`;
+
+  // ✅ faz o dedupe ser "por keyword"
+  // (mesma notícia pode aparecer em keywords diferentes, como era antes)
+  const kw = String(item?.keyword || "").trim().toLowerCase();
+
+  const base = url ? `U:${url}` : `TS:${source}__${title}`;
+  return kw ? `${base}__K:${kw}` : base;
 }
+
 
 // ============================
 // ✅ KEYWORDS helpers
