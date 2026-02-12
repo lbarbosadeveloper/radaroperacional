@@ -694,4 +694,7 @@ html, body { overflow-x: hidden; }
 /* ✅ garante que o viewport do carrossel realmente corta o track */
 .car-viewport { overflow: hidden; min-width: 0; max-width: none; margin: 0; width: 100%; }
 #results { min-width: 0; }
+html, body { overflow-x: hidden; }
+.car-viewport { max-width: none; margin: 0; width: 100%; }
+
 
