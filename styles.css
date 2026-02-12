@@ -684,3 +684,11 @@ html { background: var(--bg); }
   opacity:.8;
   font-size:12px;
 }
+
+/* ✅ resolve o mapa “sumindo”/indo pro canto: quebra a topRow antes */
+@media (max-width: 1250px){
+  .topRow{
+    grid-template-columns: 1fr;
+  }
+}
+
