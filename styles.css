@@ -681,3 +681,17 @@ html { background: var(--bg); }
   opacity:.8;
   font-size:12px;
 }
+/* ✅ trava qualquer “empurrão” horizontal do carrossel */
+html, body { overflow-x: hidden; }
+
+/* ✅ garante que os itens do grid não estiquem por causa de conteúdo interno */
+.topRow > * { min-width: 0; }
+
+/* ✅ garante que o mapa não encolha/suma quando a página reflow */
+.mapPanel { min-height: 320px; }
+.mapWrap  { min-height: 260px; }
+
+/* ✅ garante que o viewport do carrossel realmente corta o track */
+.car-viewport { overflow: hidden; min-width: 0; max-width: none; margin: 0; width: 100%; }
+#results { min-width: 0; }
+
