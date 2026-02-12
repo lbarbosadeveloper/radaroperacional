@@ -77,67 +77,37 @@
         </section>
 
         <!-- CLIMA -->
-        <section class="panel weatherPanel">
-          <div class="panelHead">
-            <h2>Clima</h2>
-          </div>
+        <!-- =========================
+     CARD: ESTÁGIO DA CIDADE
+     (substitui o card do clima)
+========================= -->
+<section class="panel stagePanel" id="stagePanel" aria-label="Estágio Operacional da Cidade">
+  <header class="stageHeader">
+    <div class="stageTitle">
+      <span class="stageKicker">Cidade no</span>
+      <strong class="stageMain">ESTÁGIO</strong>
+    </div>
 
-          <div class="weather">
-            <div class="weatherTop">
-              <div class="temp" id="wTemp">--°</div>
-              <div class="place">
-                <div class="placeTitle" id="wPlace">Carregando...</div>
-                <div class="placeSub" id="wCond">—</div>
-              </div>
-            </div>
+    <div class="stageBadge" id="stageBadge" role="img" aria-label="Estágio 2">
+      <div class="stageBadgeInner">
+        <span class="stageBadgeSmall">ESTÁGIO</span>
+        <span class="stageBadgeNumber" id="stageNumber">2</span>
+      </div>
+    </div>
+  </header>
 
-            <div class="weatherGrid">
-              <div class="wCard">
-                <div class="wLabel">Vento</div>
-                <div class="wValue" id="wWind">—</div>
-              </div>
-              <div class="wCard">
-                <div class="wLabel">Umidade</div>
-                <div class="wValue" id="wHum">—</div>
-              </div>
-              <div class="wCard">
-                <div class="wLabel">Sensação</div>
-                <div class="wValue" id="wFeels">—</div>
-              </div>
-              <div class="wCard">
-                <div class="wLabel">Atualizado</div>
-                <div class="wValue" id="wUpdated">—</div>
-              </div>
-            </div>
-          </div>
-        </section>
+  <div class="stageDots" aria-label="Indicador de estágios">
+    <button class="stageDot" data-stage="1" aria-label="Estágio 1"></button>
+    <button class="stageDot is-active" data-stage="2" aria-label="Estágio 2"></button>
+    <button class="stageDot" data-stage="3" aria-label="Estágio 3"></button>
+    <button class="stageDot" data-stage="4" aria-label="Estágio 4"></button>
+    <button class="stageDot" data-stage="5" aria-label="Estágio 5"></button>
+  </div>
 
-        <!-- ✅ MAPA (WAZE LIVE MAP - COM TRÂNSITO) -->
-        <section class="panel mapPanel">
-          <div class="panelHead">
-            </div>
-
-          <div class="mapWrap">
-            <!--
-              ✅ Troque LAT/LON pelo ponto exato do pedágio (quando você tiver).
-              Por enquanto deixei o mesmo ponto do clima (Água Santa).
-              zoom: 14~17 costuma ficar bom.
-            -->
-            <iframe
-              class="mapEl"
-              title="Mapa Waze - Trânsito"
-              src="https://embed.waze.com/iframe?zoom=15&lat=-22.907054&lon=-43.308952&ct=livemap"
-              width="100%"
-              height="100%"
-              style="border:0; filter: invert(1) hue-rotate(180deg) contrast(1.05) saturate(0.95);"
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
-              allowfullscreen
-            ></iframe>
-          </div>
-        </section>
-
-      </section>
+  <p class="stageHint" id="stageHint">
+    Operação normal com atenção. Ajuste manual aqui por enquanto.
+  </p>
+</section>
 
       <!-- RESULTADOS -->
       <section class="panel resultsPanel">
