@@ -686,8 +686,25 @@ body{
 }
 html, body { min-height: 100vh; }
 html { background: var(--bg); }
-/* carrossel ocupar 100% até o canto */
-#carousel { padding-inline: 0 !important; }
-#carousel .car-viewport { width: 100% !important; }
+/* ✅ Faz o carrossel ir até o canto (botões não roubam largura) */
+#carousel{
+  position: relative;
+}
+
+#carousel .car-viewport{
+  width: 100%;
+}
+
+#carousel .car-btn{
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+}
+
+#carousel .car-btn.prev{ left: 8px; }
+#carousel .car-btn.next{ right: 8px; }
+
+
 
 
