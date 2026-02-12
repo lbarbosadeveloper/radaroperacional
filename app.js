@@ -851,68 +851,6 @@ setTimeout(refreshWazeIframe, 2000);
 
 // atualiza periodicamente
 setInterval(refreshWazeIframe, 3 * 60 * 1000);
-// ============================
-// ✅ Estágio da Cidade (manual por enquanto)
-// ============================
-(function initCityStage(){
-  const panel = document.getElementById("stagePanel");
-  const badge = document.getElementById("stageBadge");
-  const numberEl = document.getElementById("stageNumber");
-  const hintEl = document.getElementById("stageHint");
-  const dots = Array.from(document.querySelectorAll(".stageDot"));
-
-  if (!panel || !badge || !numberEl || !dots.length) return;
-
-  const STORAGE_KEY = "radar_city_stage_v1";
-
-  function stageText(n){
-    switch (n){
-      case 1: return "Operação normal. Sem ocorrências relevantes.";
-      case 2: return "Atenção: condição moderada. Possíveis impactos pontuais.";
-      case 3: return "Alerta: impactos prováveis. Monitorar vias e ocorrências.";
-      case 4: return "Crítico: impactos severos. Atenção total e contingência.";
-      case 5: return "Emergência: cenário extremo. Operação em regime especial.";
-      default: return "—";
-    }
-  }
-
-  function setStage(n, {save=true, pulse=true} = {}){
-    n = Math.max(1, Math.min(5, Number(n) || 2));
-
-    panel.dataset.stage = String(n);
-    numberEl.textContent = String(n);
-    badge.setAttribute("aria-label", `Estágio ${n}`);
-
-    dots.forEach(d => d.classList.toggle("is-active", Number(d.dataset.stage) === n));
-
-    if (hintEl) hintEl.textContent = stageText(n);
-
-    if (pulse){
-      badge.classList.remove("is-pulse");
-      // força reflow pra animação sempre disparar
-      void badge.offsetWidth;
-      badge.classList.add("is-pulse");
-    }
-
-    if (save) localStorage.setItem(STORAGE_KEY, String(n));
-  }
-
-  // Carrega estágio salvo (ou 2 padrão)
-  const saved = Number(localStorage.getItem(STORAGE_KEY)) || 2;
-  setStage(saved, {save:false, pulse:false});
-
-  // Clique nas bolinhas
-  dots.forEach(d => {
-    d.addEventListener("click", () => setStage(d.dataset.stage));
-  });
-
-  // Atalho: teclas 1-5 quando o painel estiver na tela
-  window.addEventListener("keydown", (e) => {
-    if (!panel) return;
-    const k = e.key;
-    if (k >= "1" && k <= "5") setStage(Number(k));
-  });
-})();
 
   
   // ===== Init =====
@@ -939,5 +877,3 @@ setInterval(refreshWazeIframe, 3 * 60 * 1000);
     }
   });
 });
-
-
