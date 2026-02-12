@@ -361,7 +361,7 @@ function stopMarquee() {
   marqueeRAF = null;
 }
 
-function setupInfiniteMarquee({ speedPxPerSec = 55, minCards = 10 } = {}) {
+function setupInfiniteMarquee({ speedPxPerSec = 55, minCards = 24 } = {}) {
   const carousel = document.getElementById("carousel");
   const track = document.getElementById("results");
   const viewport = carousel?.querySelector(".car-viewport");
