@@ -465,7 +465,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // total dinâmico: garante “justiça” quando você adiciona keywords
   function maxTodayItemsNow() {
     const dynamic = keywords.length * MAX_RESULTS_PER_KEYWORD;
-    return Math.min(MAX_TOTAL_ITEMS_CAP, Math.max(8, dynamic));
+    return Math.min(MAX_TOTAL_ITEMS_CAP, Math.max(20, dynamic));
   }
 
   function setStatus(txt) {
