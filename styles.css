@@ -20,6 +20,9 @@ body{
   color:var(--text);
 }
 
+html, body { min-height: 100vh; }
+html { background: var(--bg); }
+
 /* HEADER */
 .topbar.full{
   width:100%;
@@ -31,7 +34,7 @@ body{
 }
 
 .topbar-inner{
-  width:min(1400px,96vw);
+  width: 98vw;              /* ✅ alinha com o corpo */
   margin:0 auto;
   display:flex;
   justify-content:space-between;
@@ -340,11 +343,13 @@ body{
   margin-top: 10px;
 }
 
+/* ✅ TIRA a trava de 1400px: agora vai até o canto */
 .car-viewport{
-  max-width: 1400px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   overflow: hidden;
-  padding: 0 52px;
+  padding: 0 52px; /* espaço pros botões */
+  max-width: none;
 }
 
 /* Track */
@@ -557,9 +562,7 @@ body{
 .car-btn.next{ right: 10px; }
 .car-btn:hover{ background: rgba(10,16,26,.85); }
 
-/* =========================
-   SETAS: só no hover do carrossel
-========================= */
+/* SETAS: só no hover do carrossel */
 .carousel .car-btn{
   opacity:0;
   pointer-events:none;
@@ -572,9 +575,7 @@ body{
   transform: translateY(-50%) scale(1);
 }
 
-/* =========================
-   MODO MARQUEE INFINITO
-========================= */
+/* MODO MARQUEE INFINITO */
 #carousel.is-marquee .car-viewport{
   overflow: hidden;
   position: relative;
@@ -598,7 +599,7 @@ body{
 
 @media (max-width: 720px){
   .car-btn{ display:none; }
-  .carousel .car-btn{ display:none; } /* garante no mobile */
+  .carousel .car-btn{ display:none; }
   .car-viewport{ padding: 0 12px; }
   #results > .news-card{ width: 86vw; max-width: 86vw; }
   .kw-text{ max-width: 60vw; }
@@ -632,9 +633,7 @@ body{
   max-width: 520px;
 }
 
-/* =========================
-   RESULTADOS: meta + botão
-========================= */
+/* RESULTADOS: meta + botão */
 .resultsTitle{
   display:flex;
   flex-direction:column;
@@ -656,9 +655,7 @@ body{
   font-weight:800;
 }
 
-/* =========================
-   CHIP DE TEMPO (mini)
-========================= */
+/* CHIP DE TEMPO (mini) */
 .chipRow{
   display:flex;
   gap:8px;
@@ -684,32 +681,3 @@ body{
   opacity:.8;
   font-size:12px;
 }
-html, body { min-height: 100vh; }
-html { background: var(--bg); }
-/* ✅ Faz o carrossel ir até o canto (botões não roubam largura) */
-#carousel{
-  position: relative;
-}
-
-#carousel .car-viewport{
-  width: 100%;
-}
-
-#carousel .car-btn{
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 5;
-}
-
-#carousel .car-btn.prev{ left: 8px; }
-#carousel .car-btn.next{ right: 8px; }
-
-/* opcional: dá espaço pros botões não taparem os cards */
-#carousel .car-viewport{ padding: 0 44px; }
-
-
-
-
-
-
