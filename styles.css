@@ -338,7 +338,7 @@ html { background: var(--bg); }
 ========================= */
 .carousel{
   position: relative;
-  width: 1000px;
+  width: auto;
   margin-top: 10px;
   overflow: hidden; /* ✅ corta qualquer vazamento */
 }
@@ -691,5 +691,6 @@ html { background: var(--bg); }
     grid-template-columns: 1fr;
   }
 }
+
 
 
