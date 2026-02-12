@@ -8,6 +8,10 @@
   --muted: rgba(235,245,255,.55);
 }
 
+html, body{
+  height: 100%;
+  background: var(--bg) !important;
+}
 /* RESET */
 *{ box-sizing:border-box; }
 body{
@@ -684,3 +688,4 @@ body{
   opacity:.8;
   font-size:12px;
 }
+
