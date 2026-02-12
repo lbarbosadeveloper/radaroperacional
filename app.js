@@ -650,7 +650,7 @@ document.addEventListener("DOMContentLoaded", () => {
               <span class="chipLabel">${chip2}</span>
             </span>
           </div>
-          ${live ? `<span class="badge-live">LIVE</span>` : ``}
+          ${live ? `<span class="badge-live">AO VIVO</span>` : ``}
         </header>
 
         <h3 class="news-title">${title}</h3>
