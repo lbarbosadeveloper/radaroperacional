@@ -705,6 +705,11 @@ html { background: var(--bg); }
 #carousel .car-btn.prev{ left: 8px; }
 #carousel .car-btn.next{ right: 8px; }
 
+/* opcional: dá espaço pros botões não taparem os cards */
+#carousel .car-viewport{ padding: 0 44px; }
+
+
+
 
 
 
