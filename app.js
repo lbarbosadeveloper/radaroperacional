@@ -830,6 +830,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+// ===== Refresh automático do Waze (Live reforçado) =====
+function refreshWazeIframe() {
+  const iframe = document.querySelector('.mapEl');
+  if (!iframe) return;
+
+  const url = new URL(iframe.src);
+  url.searchParams.set('_t', Date.now()); // evita cache
+  iframe.src = url.toString();
+}
+
+// atualiza a cada 3 minutos
+setInterval(refreshWazeIframe, 3 * 60 * 1000);
+  
   // ===== Init =====
   renderKeywords();
   renderResults();
