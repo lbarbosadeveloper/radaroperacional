@@ -689,4 +689,135 @@ body{
   font-size:12px;
 }
 
+/* =========================
+   CARD: Estágio da Cidade
+========================= */
+.stagePanel{
+  position: relative;
+  overflow: hidden;
+  padding: 18px 18px 16px;
+  border-radius: 18px;
+  background:
+    radial-gradient(600px 300px at 20% 15%, rgba(255,255,255,.10), transparent 60%),
+    radial-gradient(500px 300px at 80% 40%, rgba(255,255,255,.07), transparent 60%),
+    var(--panel);
+  border: 1px solid var(--stroke);
+}
+
+.stageHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 14px;
+}
+
+.stageTitle{
+  display:flex;
+  flex-direction:column;
+  line-height:1.05;
+}
+
+.stageKicker{
+  font-size: 14px;
+  color: var(--muted);
+  letter-spacing:.2px;
+}
+
+.stageMain{
+  font-size: 22px;
+  color: var(--text);
+  letter-spacing:.6px;
+}
+
+.stageBadge{
+  width: 120px;
+  height: 120px;
+  border-radius: 999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+
+.stageBadgeInner{
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap: 2px;
+  color: #0b1220;
+  font-weight: 700;
+  text-align:center;
+}
+
+.stageBadgeSmall{
+  font-size: 12px;
+  opacity: .85;
+  letter-spacing: .6px;
+}
+
+.stageBadgeNumber{
+  font-size: 44px;
+  line-height: 1;
+}
+
+.stageDots{
+  margin-top: 14px;
+  padding: 12px 12px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.10);
+  display:flex;
+  gap: 10px;
+  justify-content:center;
+  align-items:center;
+}
+
+.stageDot{
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.08);
+  cursor:pointer;
+  position:relative;
+  transition: transform .12s ease, background .12s ease, border-color .12s ease;
+}
+
+.stageDot:hover{ transform: translateY(-1px); }
+
+.stageDot.is-active{
+  border-color: rgba(255,255,255,.35);
+  box-shadow: 0 0 0 3px rgba(255,255,255,.10);
+}
+
+/* Texto inferior */
+.stageHint{
+  margin: 12px 2px 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* =========================
+   CORES por estágio
+========================= */
+.stagePanel[data-stage="1"] .stageBadgeInner{ background: #26c281; } /* verde */
+.stagePanel[data-stage="2"] .stageBadgeInner{ background: #f2b300; } /* amarelo */
+.stagePanel[data-stage="3"] .stageBadgeInner{ background: #ff7a18; } /* laranja */
+.stagePanel[data-stage="4"] .stageBadgeInner{ background: #ff3b30; } /* vermelho */
+.stagePanel[data-stage="5"] .stageBadgeInner{ background: #8e44ad; } /* roxo */
+
+/* pulso discreto quando muda */
+@keyframes stagePulse {
+  0% { transform: scale(1); box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+  50% { transform: scale(1.03); box-shadow: 0 14px 40px rgba(0,0,0,.35); }
+  100% { transform: scale(1); box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+}
+.stageBadge.is-pulse{ animation: stagePulse .35s ease; }
+
 
