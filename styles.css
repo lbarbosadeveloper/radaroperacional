@@ -88,6 +88,9 @@ html { background: var(--bg); }
   display:grid;
   grid-template-columns:1fr;
   gap:16px;
+
+  /* ✅ FIX: não deixa os filhos “esticarem” quando algo abaixo cresce */
+  align-items: start;
 }
 
 /* ✅ TOP ROW: 3 colunas (Buscas | Clima | Mapa) */
@@ -95,6 +98,12 @@ html { background: var(--bg); }
   display:grid;
   grid-template-columns: 380px minmax(320px, 1fr) minmax(420px, 1fr);
   gap:16px;
+
+  /* ✅ FIX: no grid, o padrão é stretch. Isso aqui impede o “esticão” */
+  align-items: start;
+
+  /* ✅ FIX extra: garante que a altura da linha seja “conteúdo”, não “estica” */
+  grid-auto-rows: min-content;
 }
 .topRow > *{ min-width:0; } /* ✅ evita “esticar” por conteúdo interno */
 
@@ -104,6 +113,9 @@ html { background: var(--bg); }
   border:1px solid var(--stroke);
   border-radius:18px;
   padding:16px;
+
+  /* ✅ FIX: cada painel não deve “encher” altura disponível do grid */
+  align-self: start;
 }
 
 .panelHead{
@@ -139,6 +151,9 @@ html { background: var(--bg); }
   flex-direction:column;
   gap:12px;
   min-height: 320px; /* ✅ não “some” */
+
+  /* ✅ FIX: não deixa painel crescer por causa do grid */
+  align-self: start;
 }
 
 /* dá um "respiro" e garante altura consistente */
@@ -691,9 +706,3 @@ html { background: var(--bg); }
     grid-template-columns: 1fr;
   }
 }
-
-
-
-
-
-
