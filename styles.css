@@ -77,7 +77,7 @@ body{
 
 /* LAYOUT */
 .wrap{
-  width:min(1500px,96vw);
+  width: 98vw;
   margin:20px auto 40px;
 }
 
@@ -686,3 +686,4 @@ body{
 }
 html, body { min-height: 100vh; }
 html { background: var(--bg); }
+
