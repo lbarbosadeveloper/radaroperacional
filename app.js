@@ -786,7 +786,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setStatus("idle");
 
   loadWeather();
-  setInterval(loadWeather, 10 * 60 * 1000);
+  setInterval(loadWeather, 5 * 60 * 1000);
 
   // ✅ inicia o mapa (se o #map existir)
   initGoogleMapIfPossible();
@@ -794,7 +794,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setTimeout(initGoogleMapIfPossible, 1000);
 
   runScan();
-  setInterval(runScan, 10 * 60 * 1000);
+  setInterval(runScan, 5 * 60 * 1000);
 
   // ✅ se redimensionar a tela, tenta resize do mapa
   window.addEventListener("resize", () => {
