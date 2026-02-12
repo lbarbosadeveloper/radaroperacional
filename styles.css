@@ -20,9 +20,6 @@ body{
   color:var(--text);
 }
 
-html, body { min-height: 100vh; overflow-x: hidden; } /* ✅ evita “esticar” a tela */
-html { background: var(--bg); }
-
 /* HEADER */
 .topbar.full{
   width:100%;
@@ -34,7 +31,7 @@ html { background: var(--bg); }
 }
 
 .topbar-inner{
-  width: 98vw;
+  width:min(1400px,96vw);
   margin:0 auto;
   display:flex;
   justify-content:space-between;
@@ -80,7 +77,7 @@ html { background: var(--bg); }
 
 /* LAYOUT */
 .wrap{
-  width: 98vw;
+  width:min(1500px,96vw);
   margin:20px auto 40px;
 }
 
@@ -96,7 +93,7 @@ html { background: var(--bg); }
   grid-template-columns: 380px minmax(320px, 1fr) minmax(420px, 1fr);
   gap:16px;
 }
-.topRow > *{ min-width:0; } /* ✅ evita “esticar” por conteúdo interno */
+.topRow > *{ min-width:0; }
 
 /* PANELS */
 .panel{
@@ -138,7 +135,6 @@ html { background: var(--bg); }
   display:flex;
   flex-direction:column;
   gap:12px;
-  min-height: 320px; /* ✅ não “some” */
 }
 
 /* dá um "respiro" e garante altura consistente */
@@ -146,7 +142,7 @@ html { background: var(--bg); }
   position: relative;
   flex: 1 1 auto;
   height: 100%;
-  min-height: 260px;
+  min-height: 260px; /* altura mínima pro mapa ficar lindo */
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid rgba(170,220,255,.14);
@@ -169,6 +165,8 @@ html { background: var(--bg); }
   width:100%;
   height:100%;
   border:0;
+
+  /* dark "fake", mas fica bem bonito no seu UI */
   filter: invert(1) hue-rotate(180deg) contrast(1.05) saturate(.95);
 }
 
@@ -338,34 +336,28 @@ html { background: var(--bg); }
 ========================= */
 .carousel{
   position: relative;
-  width: auto;
-  margin-top: 10px;
-  overflow: hidden; /* ✅ corta qualquer vazamento */
-}
-
-/* viewport ocupa tudo */
-.car-viewport{
   width: 100%;
-  margin: 0;
-  overflow: hidden;
-  padding: 0 52px; /* espaço pros botões */
-  max-width: none;
-  min-width: 0;
+  margin-top: 10px;
 }
 
-/* Track — FIX definitivo do “esticando a tela” */
+.car-viewport{
+  max-width: 1400px;
+  margin: 0 auto;
+  overflow: hidden;
+  padding: 0 52px;
+}
+
+/* Track */
 #results{
-  display: inline-flex;     /* ✅ */
+  display: flex;
   gap: 16px;
   align-items: stretch;
   justify-content: flex-start;
   padding: 8px 4px 14px;
   flex-wrap: nowrap;
-  width: fit-content;       /* ✅ substitui max-content */
-  max-width: 100%;          /* ✅ nunca passa do viewport */
+  width: max-content;
   will-change: transform;
   transform: translate3d(0,0,0);
-  min-width: 0;
 }
 
 /* ✅ Agora os cards são news-card */
@@ -415,15 +407,15 @@ html { background: var(--bg); }
   flex-direction: column;
   gap: 8px;
   min-width: 0;
-  align-items: flex-start;
+  align-items: flex-start; /* ✅ evita chip esticar */
 }
 
 /* chips do card (tamanho do conteúdo) */
 .chipCard{
   display:inline-flex;
   align-items:center;
-  width: fit-content;
-  max-width: 100%;
+  width: fit-content;     /* ✅ ajusta na largura do texto */
+  max-width: 100%;        /* ✅ mas não passa do card */
   padding: 8px 12px;
   border-radius: 999px;
   border: 1px solid rgba(150,210,255,.14);
@@ -439,9 +431,9 @@ html { background: var(--bg); }
 .chipCard-url{
   display:inline-flex;
   align-items:center;
-  width: fit-content;
+  width: fit-content;     /* ✅ não ocupa a linha inteira */
   gap: 8px;
-  padding: 7px 10px;
+  padding: 7px 10px;      /* ✅ deixa mais "justinho" */
   color: rgba(235,245,255,.62);
 }
 
@@ -505,7 +497,7 @@ html { background: var(--bg); }
 
   display:-webkit-box;
   -webkit-box-orient:vertical;
-  -webkit-line-clamp:3;
+  -webkit-line-clamp:3;  /* ✅ 3 linhas */
   overflow:hidden;
 }
 
@@ -518,7 +510,7 @@ html { background: var(--bg); }
 
   display:-webkit-box;
   -webkit-box-orient:vertical;
-  -webkit-line-clamp:2;
+  -webkit-line-clamp:2;  /* ✅ 2 linhas */
   overflow:hidden;
 }
 
@@ -565,7 +557,9 @@ html { background: var(--bg); }
 .car-btn.next{ right: 10px; }
 .car-btn:hover{ background: rgba(10,16,26,.85); }
 
-/* SETAS: só no hover do carrossel */
+/* =========================
+   SETAS: só no hover do carrossel
+========================= */
 .carousel .car-btn{
   opacity:0;
   pointer-events:none;
@@ -578,7 +572,9 @@ html { background: var(--bg); }
   transform: translateY(-50%) scale(1);
 }
 
-/* MODO MARQUEE INFINITO */
+/* =========================
+   MODO MARQUEE INFINITO
+========================= */
 #carousel.is-marquee .car-viewport{
   overflow: hidden;
   position: relative;
@@ -602,7 +598,7 @@ html { background: var(--bg); }
 
 @media (max-width: 720px){
   .car-btn{ display:none; }
-  .carousel .car-btn{ display:none; }
+  .carousel .car-btn{ display:none; } /* garante no mobile */
   .car-viewport{ padding: 0 12px; }
   #results > .news-card{ width: 86vw; max-width: 86vw; }
   .kw-text{ max-width: 60vw; }
@@ -636,7 +632,9 @@ html { background: var(--bg); }
   max-width: 520px;
 }
 
-/* RESULTADOS: meta + botão */
+/* =========================
+   RESULTADOS: meta + botão
+========================= */
 .resultsTitle{
   display:flex;
   flex-direction:column;
@@ -658,7 +656,9 @@ html { background: var(--bg); }
   font-weight:800;
 }
 
-/* CHIP DE TEMPO (mini) */
+/* =========================
+   CHIP DE TEMPO (mini)
+========================= */
 .chipRow{
   display:flex;
   gap:8px;
@@ -683,11 +683,4 @@ html { background: var(--bg); }
 .chipTiny .ico{
   opacity:.8;
   font-size:12px;
-}
-
-/* ✅ resolve o mapa “sumindo”/indo pro canto: quebra a topRow antes */
-@media (max-width: 1250px){
-  .topRow{
-    grid-template-columns: 1fr;
-  }
 }
