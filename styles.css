@@ -691,6 +691,41 @@ html { background: var(--bg); }
     grid-template-columns: 1fr;
   }
 }
+/* FIX: Impede o carrossel de esticar a tela horizontalmente */
+
+/* 1. Garante que o grid principal não ultrapasse a largura da viewport */
+.gridMain {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* 2. Força o carrossel a respeitar o limite do pai e esconder o que sobra */
+.carousel {
+    width: 100% !important;
+    max-width: 98vw !important; /* Mesma largura da sua .wrap */
+    overflow: hidden !important;
+    display: block !important;
+}
+
+/* 3. Ajusta o viewport para não expandir além do carrossel */
+.car-viewport {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    min-width: 0 !important;
+}
+
+/* 4. O container de resultados cresce internamente, mas o pai corta o excesso */
+#results {
+    width: max-content !important; 
+    display: flex !important;
+}
+
+/* 5. Ajuste de segurança para o wrap principal */
+.wrap {
+    max-width: 98vw;
+    overflow: hidden;
+}
 
 
 
