@@ -658,7 +658,7 @@ document.addEventListener("DOMContentLoaded", () => {
       els.results.appendChild(card);
     });
 
-    setupInfiniteMarquee({ speedPxPerSec: 55, minCards: 10 });
+    setupInfiniteMarquee({ speedPxPerSec: 55, minCards: 24 });
   }
 
   async function searchWeb(keyword) {
