@@ -1,169 +1,692 @@
-<!-- index.html -->
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Radar Operacional Lamsa</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
+/* styles.css */
+:root{
+  --bg:#060a12;
+  --panel: rgba(10,16,26,.78);
+  --panel2: rgba(12,20,34,.6);
+  --stroke: rgba(170,220,255,.18);
+  --text: rgba(235,245,255,.92);
+  --muted: rgba(235,245,255,.55);
+}
 
-  <!-- HEADER FULL WIDTH -->
-  <header class="topbar full">
-    <div class="topbar-inner">
-      <div class="topbar-left">
-        <img
-          src="./assets/lamsa-logo.png"
-          alt="LAMSA"
-          id="lamsaLogo"
-          class="lamsaLogo logo-pulse"
-          role="button"
-          tabindex="0"
-          title="Atualizar página"
-        />
-        <span class="appTitle">Radar Operacional LAMSA</span>
-      </div>
+html, body{
+  height: 100%;
+  background: var(--bg) !important;
+}
+/* RESET */
+*{ box-sizing:border-box; }
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background:
+    radial-gradient(1200px 800px at 20% 10%, rgba(90,220,255,.12), transparent 60%),
+    radial-gradient(1000px 800px at 80% 30%, rgba(160,120,255,.12), transparent 60%),
+    var(--bg);
+  color:var(--text);
+}
 
-      <div class="topbar-right">
-        <div class="pill">
-          <span class="dot"></span>
-          <span id="statusText">idle</span>
-        </div>
-        <div class="clock" id="clock">--:--:--</div>
-      </div>
-    </div>
-  </header>
+/* HEADER */
+.topbar.full{
+  width:100%;
+  height:90px;
+  background:rgba(8,12,20,.9);
+  border-bottom:1px solid var(--stroke);
+  display:flex;
+  align-items:center;
+}
 
-  <!-- CONTEÚDO -->
-  <main class="wrap">
-    <section class="gridMain">
+.topbar-inner{
+  width:min(1400px,96vw);
+  margin:0 auto;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
 
-      <!-- LINHA DE CIMA -->
-      <section class="topRow">
+.topbar-left{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
 
-        <!-- PALAVRAS-CHAVE (EDITÁVEL) -->
-        <section class="panel keywordsPanel">
-          <section class="kw-panel">
-            <div class="kw-head">
-              <h2>Buscas</h2>
-              <div class="kw-actions">
-                <button id="kwClear" class="btn ghost" type="button" title="Limpar tudo">Limpar</button>
-                <button id="kwReset" class="btn ghost" type="button" title="Voltar ao padrão">Padrão</button>
-              </div>
-            </div>
+.lamsaLogo{ height:120px; }
 
-            <div class="kw-inputRow">
-              <div class="kw-inputWrap">
-                <span class="kw-icon">⌕</span>
-                <input
-                  id="kwInput"
-                  class="kw-input"
-                  type="text"
-                  placeholder="Inserir palavras"
-                  autocomplete="off"
-                />
-              </div>
-              <button id="kwAdd" class="btn primary" type="button">+ Adicionar</button>
-            </div>
+.appTitle{
+  font-size:50px;
+  font-weight:800;
+  letter-spacing:.04em;
+}
 
-            <div id="kwChips" class="kw-chips" aria-label="Lista de palavras-chave"></div>
+.topbar-right{
+  display:flex;
+  gap:12px;
+  align-items:center;
+}
 
-            <div class="kw-foot">
-              <small id="kwCount" class="kw-count">0 palavras-chave</small>
-              <button id="kwCopy" class="btn ghost" type="button">Copiar lista</button>
-            </div>
-          </section>
-        </section>
+.pill, .clock{
+  padding:12px 12px;
+  border-radius:999px;
+  border:1px solid var(--stroke);
+  background:rgba(8,12,20,.6);
+  font-size:10px;
+}
 
-        <!-- CLIMA -->
-        <section class="panel weatherPanel">
-          <div class="panelHead">
-            <h2>Clima</h2>
-          </div>
+.dot{
+  width:8px;
+  height:8px;
+  background:#ffffff;
+  border-radius:50%;
+  display:inline-block;
+  margin-right:6px;
+}
 
-          <div class="weather">
-            <div class="weatherTop">
-              <div class="temp" id="wTemp">--°</div>
-              <div class="place">
-                <div class="placeTitle" id="wPlace">Carregando...</div>
-                <div class="placeSub" id="wCond">—</div>
-              </div>
-            </div>
+/* LAYOUT */
+.wrap{
+  width:min(1500px,96vw);
+  margin:20px auto 40px;
+}
 
-            <div class="weatherGrid">
-              <div class="wCard">
-                <div class="wLabel">Vento</div>
-                <div class="wValue" id="wWind">—</div>
-              </div>
-              <div class="wCard">
-                <div class="wLabel">Umidade</div>
-                <div class="wValue" id="wHum">—</div>
-              </div>
-              <div class="wCard">
-                <div class="wLabel">Sensação</div>
-                <div class="wValue" id="wFeels">—</div>
-              </div>
-              <div class="wCard">
-                <div class="wLabel">Atualizado</div>
-                <div class="wValue" id="wUpdated">—</div>
-              </div>
-            </div>
-          </div>
-        </section>
+.gridMain{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+}
 
-        <!-- ✅ MAPA (WAZE LIVE MAP - COM TRÂNSITO) -->
-        <section class="panel mapPanel">
-          <div class="panelHead">
-            </div>
+/* ✅ TOP ROW: 3 colunas (Buscas | Clima | Mapa) */
+.topRow{
+  display:grid;
+  grid-template-columns: 380px minmax(320px, 1fr) minmax(420px, 1fr);
+  gap:16px;
+}
+.topRow > *{ min-width:0; }
 
-          <div class="mapWrap">
-            <!--
-              ✅ Troque LAT/LON pelo ponto exato do pedágio (quando você tiver).
-              Por enquanto deixei o mesmo ponto do clima (Água Santa).
-              zoom: 14~17 costuma ficar bom.
-            -->
-            <iframe
-              class="mapEl"
-              title="Mapa Waze - Trânsito"
-              src="https://embed.waze.com/iframe?zoom=15&lat=-22.907054&lon=-43.308952&ct=livemap"
-              width="100%"
-              height="100%"
-              style="border:0; filter: invert(1) hue-rotate(180deg) contrast(1.05) saturate(0.95);"
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
-              allowfullscreen
-            ></iframe>
-          </div>
-        </section>
+/* PANELS */
+.panel{
+  background:linear-gradient(180deg,var(--panel),var(--panel2));
+  border:1px solid var(--stroke);
+  border-radius:18px;
+  padding:16px;
+}
 
-      </section>
+.panelHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
 
-      <!-- RESULTADOS -->
-      <section class="panel resultsPanel">
-        <div class="panelHead resultsHead">
-          <div>
-            <h2>Resultados</h2>
-            <p></p>
-            <small class="hintSmall"></small>
-          </div>
-        </div>
+.panelHead h2{ margin:0; font-size:18px; }
+.panelHead p{ margin:6px 0 0; font-size:12px; color:var(--muted); }
 
-        <!-- Carrossel -->
-        <div class="carousel" id="carousel">
-          <button class="car-btn prev" id="prevBtn" aria-label="Anterior">‹</button>
+.resultsHead{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  margin-bottom:10px;
+}
+.hintSmall{
+  display:block;
+  margin-top:6px;
+  color:var(--muted);
+  font-size:12px;
+}
 
-          <div class="car-viewport">
-            <div class="results" id="results"></div>
-          </div>
+/* =========================
+   ✅ MAPA (Waze / iframe)
+========================= */
+.mapPanel{
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
 
-          <button class="car-btn next" id="nextBtn" aria-label="Próximo">›</button>
-        </div>
-      </section>
+/* dá um "respiro" e garante altura consistente */
+.mapWrap{
+  position: relative;
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 260px; /* altura mínima pro mapa ficar lindo */
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(170,220,255,.14);
+  background: rgba(8,12,20,.5);
+  box-shadow:
+    0 14px 40px rgba(8,12,20,.45),
+    inset 0 1px 0 rgba(255,255,255,.05);
+}
 
-    </section>
-  </main>
+/* (mantém compatibilidade caso você use div #map em algum momento) */
+.mapEl,
+#map{
+  width: 100%;
+  height: 100%;
+}
 
-  <script src="./app.js"></script>
-</body>
-</html>
+/* ✅ WAZE DARK + 100% FIX (sem borda, sem scroll estranho) */
+.mapWrap iframe.mapEl{
+  display:block;
+  width:100%;
+  height:100%;
+  border:0;
+
+  /* dark "fake", mas fica bem bonito no seu UI */
+  filter: invert(1) hue-rotate(180deg) contrast(1.05) saturate(.95);
+}
+
+/* deixa o mapa mais "integrado" ao dark UI */
+.mapWrap::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(900px 320px at 10% 0%, rgba(90,220,255,.10), transparent 60%),
+    radial-gradient(900px 320px at 90% 0%, rgba(160,120,255,.10), transparent 60%),
+    linear-gradient(180deg, rgba(0,0,0,.12), transparent 30%, rgba(0,0,0,.18));
+  mix-blend-mode: screen;
+  opacity: .65;
+  z-index: 2;
+}
+
+/* garante que o iframe fique abaixo da overlay */
+.mapWrap > #map,
+.mapWrap > .mapEl{
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================
+   KEYWORDS EDITÁVEL
+========================= */
+.kw-panel{ display:flex; flex-direction:column; gap:12px; }
+
+.kw-head{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+}
+.kw-head h2{ margin:0; font-size:18px; }
+
+.kw-actions{ display:flex; gap:8px; }
+
+.kw-inputRow{ display:flex; gap:10px; align-items:center; }
+
+.kw-inputWrap{
+  flex:1; display:flex; align-items:center; gap:10px;
+  padding:10px 12px;
+  border-radius:14px;
+  border:1px solid var(--stroke);
+  background: rgba(8,12,20,.45);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.03);
+}
+.kw-icon{ opacity:.7; font-size:14px; }
+
+.kw-input{
+  width:100%;
+  border:0; outline:none;
+  background:transparent;
+  color: var(--text);
+  font-size:14px;
+}
+.kw-input::placeholder{ color: rgba(235,245,255,.45); }
+
+.kw-chips{
+  display:flex; flex-wrap:wrap; gap:10px;
+  padding:2px 2px;
+}
+
+.kw-chip{
+  display:inline-flex; align-items:center; gap:10px;
+  padding:10px 12px;
+  border-radius:999px;
+  border:1px solid var(--stroke);
+  background: rgba(8,12,20,.45);
+  box-shadow: 0 10px 28px rgba(0,0,0,.25);
+  transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.kw-chip:hover{
+  transform: translateY(-1px);
+  border-color: rgba(170,220,255,.32);
+  box-shadow: 0 14px 36px rgba(0,0,0,.32);
+}
+
+.kw-dot{
+  width:10px; height:10px; border-radius:50%;
+  background: rgba(235,245,255,.55);
+  box-shadow: 0 0 0 4px rgba(235,245,255,.08);
+}
+.kw-chip.ok .kw-dot{
+  background: rgba(120,255,190,.92);
+  box-shadow: 0 0 0 4px rgba(120,255,190,.10);
+}
+.kw-chip.bad .kw-dot{
+  background: rgba(255,90,90,.95);
+  box-shadow: 0 0 0 4px rgba(255,90,90,.10);
+}
+
+.kw-text{
+  font-size:14px;
+  white-space: nowrap;
+  max-width: 240px;
+  overflow:hidden;
+  text-overflow: ellipsis;
+}
+
+.kw-x{
+  width:26px; height:26px; border-radius:999px;
+  border:1px solid rgba(170,220,255,.16);
+  background: rgba(6,10,18,.35);
+  color: rgba(235,245,255,.75);
+  cursor:pointer;
+  display:grid; place-items:center;
+  transition: transform .12s ease, border-color .12s ease;
+}
+.kw-x:hover{
+  transform: scale(1.06);
+  border-color: rgba(255,120,180,.35);
+}
+
+.kw-foot{
+  display:flex; align-items:center; justify-content:space-between;
+  opacity:.9;
+}
+.kw-count{ color: rgba(235,245,255,.6); }
+
+/* Botões (base) */
+.btn{
+  border:1px solid var(--stroke);
+  background: rgba(10,16,26,.35);
+  color: rgba(235,245,255,.86);
+  padding:10px 12px;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:700;
+}
+.btn.primary{
+  background: rgba(90,220,255,.14);
+  border-color: rgba(90,220,255,.35);
+}
+.btn.ghost:hover{ border-color: rgba(170,220,255,.35); }
+
+/* WEATHER */
+.weatherTop{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px;
+  border-radius:14px;
+  border:1px solid var(--stroke);
+  background:rgba(8,12,20,.5);
+  margin-top:14px;
+}
+.temp{ font-size:46px; font-weight:900; }
+
+.weatherGrid{
+  margin-top:14px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.wCard{
+  padding:10px;
+  border-radius:12px;
+  border:1px solid var(--stroke);
+  background:rgba(8,12,20,.5);
+}
+.wLabel{ font-size:12px; color:var(--muted); }
+.wValue{ font-weight:800; }
+
+/* =========================
+   RESULTS / CAROUSEL
+========================= */
+.carousel{
+  position: relative;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.car-viewport{
+  max-width: 1400px;
+  margin: 0 auto;
+  overflow: hidden;
+  padding: 0 52px;
+}
+
+/* Track */
+#results{
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 8px 4px 14px;
+  flex-wrap: nowrap;
+  width: max-content;
+  will-change: transform;
+  transform: translate3d(0,0,0);
+}
+
+/* ✅ Agora os cards são news-card */
+#results > .news-card{
+  flex: 0 0 auto;
+  width: 400px;
+  max-width: 400px;
+}
+
+/* =========================
+   CARD
+========================= */
+.news-card{
+  position: relative;
+  border-radius: 18px;
+  padding: 18px 18px 16px;
+  background: rgba(8,12,20,.5);
+  border:1px solid var(--stroke);
+  box-shadow:
+    0 14px 40px rgba(8,12,20,.5),
+    inset 0 1px 0 rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  color: var(--text);
+}
+
+.news-card::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  background: radial-gradient(500px 220px at 15% 0%,
+    rgba(0, 0, 0, 0.1), transparent 60%);
+  pointer-events:none;
+}
+
+.news-top{
+  position: relative;
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.news-chips{
+  display:flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  align-items: flex-start; /* ✅ evita chip esticar */
+}
+
+/* chips do card (tamanho do conteúdo) */
+.chipCard{
+  display:inline-flex;
+  align-items:center;
+  width: fit-content;     /* ✅ ajusta na largura do texto */
+  max-width: 100%;        /* ✅ mas não passa do card */
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(150,210,255,.14);
+  background: rgba(255,255,255,.04);
+  color: rgba(235,245,255,.82);
+  font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chipCard-url{
+  display:inline-flex;
+  align-items:center;
+  width: fit-content;     /* ✅ não ocupa a linha inteira */
+  gap: 8px;
+  padding: 7px 10px;      /* ✅ deixa mais "justinho" */
+  color: rgba(235,245,255,.62);
+}
+
+.chipIcon{
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  opacity: .9;
+  flex: 0 0 auto;
+}
+
+.chipLabel{
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* LIVE */
+.badge-live{
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .10em;
+  color: rgba(120,255,190,.95);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(20,70,45,.22);
+  box-shadow:
+    0 0 0 4px rgba(120,255,190,.06),
+    0 0 18px rgba(120,255,190,.18);
+  user-select:none;
+}
+
+.badge-live::after{
+  content:"";
+  display:inline-block;
+  width:8px; height:8px;
+  margin-left:10px;
+  border-radius:999px;
+  background: rgba(120,255,190,.95);
+  box-shadow: 0 0 14px rgba(0, 0, 0, 0.45);
+  animation: livePulse 1.2s infinite ease-in-out;
+  vertical-align: middle;
+}
+
+@keyframes livePulse{
+  0%,100%{ transform: scale(1); opacity:.55; }
+  50%{ transform: scale(1.25); opacity:1; }
+}
+
+/* ✅ limitar linhas (título/snippet) */
+.news-title{
+  position: relative;
+  margin: 6px 0 10px;
+  color: rgba(235,245,255,.92);
+  font-weight: 850;
+  font-size: 22px;
+  line-height: 1.15;
+
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:3;  /* ✅ 3 linhas */
+  overflow:hidden;
+}
+
+.news-snippet{
+  position: relative;
+  margin: 0 0 14px;
+  color: rgba(235,245,255,.58);
+  font-size: 14px;
+  line-height: 1.4;
+
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;  /* ✅ 2 linhas */
+  overflow:hidden;
+}
+
+.news-link{
+  position: relative;
+  display:inline-flex;
+  gap: 8px;
+  align-items:center;
+  color: rgba(80,240,255,.90);
+  text-decoration: none;
+  font-weight: 750;
+  font-size: 14px;
+}
+
+.news-link:hover{
+  text-decoration: underline;
+}
+
+.news-card:hover{
+  border-color: rgba(150,210,255,.22);
+  box-shadow:
+    0 18px 55px rgba(0,0,0,.55),
+    inset 0 1px 0 rgba(255,255,255,.06);
+  transform: translateY(-1px);
+  transition: .18s ease;
+}
+
+/* Botões */
+.car-btn{
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.18);
+  background: rgba(10,16,26,.65);
+  color: #fff;
+  cursor: pointer;
+  z-index: 10;
+  backdrop-filter: blur(6px);
+}
+.car-btn.prev{ left: 10px; }
+.car-btn.next{ right: 10px; }
+.car-btn:hover{ background: rgba(10,16,26,.85); }
+
+/* =========================
+   SETAS: só no hover do carrossel
+========================= */
+.carousel .car-btn{
+  opacity:0;
+  pointer-events:none;
+  transform: translateY(-50%) scale(.96);
+  transition: opacity .15s ease, transform .15s ease, background .15s ease;
+}
+.carousel:hover .car-btn{
+  opacity:1;
+  pointer-events:auto;
+  transform: translateY(-50%) scale(1);
+}
+
+/* =========================
+   MODO MARQUEE INFINITO
+========================= */
+#carousel.is-marquee .car-viewport{
+  overflow: hidden;
+  position: relative;
+}
+
+#carousel.is-marquee #results{
+  overflow: hidden !important;
+  scroll-snap-type: none !important;
+  scroll-behavior: auto !important;
+  -webkit-overflow-scrolling: auto !important;
+}
+
+#carousel.is-marquee .car-viewport:hover #results{
+  transition: transform 0s !important;
+}
+
+/* RESPONSIVO */
+@media(max-width:900px){
+  .topRow{ grid-template-columns:1fr; }
+}
+
+@media (max-width: 720px){
+  .car-btn{ display:none; }
+  .carousel .car-btn{ display:none; } /* garante no mobile */
+  .car-viewport{ padding: 0 12px; }
+  #results > .news-card{ width: 86vw; max-width: 86vw; }
+  .kw-text{ max-width: 60vw; }
+}
+
+/* LOGO PULSE */
+@keyframes logo-pulse-loop{
+  0%{ transform:scale(1); filter:brightness(1); }
+  50%{ transform:scale(1.05); filter:brightness(1.3) drop-shadow(0 0 10px rgba(125,245,255,.5)); }
+  100%{ transform:scale(1); filter:brightness(1); }
+}
+.logo-pulse{ animation:logo-pulse-loop 1.5s infinite ease-in-out; }
+
+/* MODO GRID: mostra todos os cards (sem carrossel) */
+#carousel.show-all .car-viewport{
+  overflow: visible;
+  padding: 0;
+  max-width: none;
+}
+
+#carousel.show-all #results{
+  transform: none !important;
+  overflow: visible;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: flex-start;
+}
+
+#carousel.show-all #results > .news-card{
+  width: 520px;
+  max-width: 520px;
+}
+
+/* =========================
+   RESULTADOS: meta + botão
+========================= */
+.resultsTitle{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  width:100%;
+}
+
+.resultsMeta{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  justify-content:space-between;
+}
+
+.btn.mini{
+  padding:8px 10px;
+  border-radius:10px;
+  font-size:12px;
+  font-weight:800;
+}
+
+/* =========================
+   CHIP DE TEMPO (mini)
+========================= */
+.chipRow{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.chipTiny{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 10px;
+  border-radius:999px;
+  border:1px solid rgba(150,210,255,.12);
+  background: rgba(255,255,255,.03);
+  color: rgba(235,245,255,.70);
+  font-size:12px;
+  line-height:1;
+  white-space:nowrap;
+}
+
+.chipTiny .ico{
+  opacity:.8;
+  font-size:12px;
+}
+
+
