@@ -158,11 +158,16 @@ function normalizeDomainList(raw) {
 function buildGoogleNewsQuery(keyword, sites = []) {
   const k = String(keyword || "").trim();
   if (!k) return "";
-  if (!sites.length) return k;
+
+  // ✅ frase exata: só volta se tiver exatamente a sequência
+  const kExact = `"${k.replaceAll('"', '\\"')}"`;
+
+  if (!sites.length) return kExact;
 
   const sitePart = sites.map((d) => `site:${d}`).join(" OR ");
-  return `(${k}) (${sitePart})`;
+  return `(${kExact}) (${sitePart})`;
 }
+
 
 // ============================
 // ✅ Resolver redirect do Google News -> Publisher real
@@ -288,3 +293,4 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`API online na porta ${PORT}`);
 });
+
