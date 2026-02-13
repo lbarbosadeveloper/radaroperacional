@@ -159,14 +159,16 @@ function buildGoogleNewsQuery(keyword, sites = []) {
   const k = String(keyword || "").trim();
   if (!k) return "";
 
-  // ✅ frase exata: só volta se tiver exatamente a sequência
-  const kExact = `"${k.replaceAll('"', '\\"')}"`;
+  const kFixed = k.includes(" ")
+    ? `"${k.replaceAll('"', '\\"')}"`
+    : k;
 
-  if (!sites.length) return kExact;
+  if (!sites.length) return kFixed;
 
   const sitePart = sites.map((d) => `site:${d}`).join(" OR ");
-  return `(${kExact}) (${sitePart})`;
+  return `(${kFixed}) (${sitePart})`;
 }
+
 
 
 // ============================
@@ -293,4 +295,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`API online na porta ${PORT}`);
 });
+
 
