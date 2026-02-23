@@ -780,6 +780,26 @@ body{
   box-shadow:0 0 18px rgba(255,180,0,.35);
   color:#fff;
 }
+/* ===== Estágios (cores COR) ===== */
+.stageDots .dot.on[data-stage="1"],
+.stageDots .dot.active[data-stage="1"] { background: rgba(46, 204, 113, .22); border-color: rgba(46, 204, 113, .45); color:#fff; }
+.stageDots .dot.active[data-stage="1"] { box-shadow: 0 0 18px rgba(46, 204, 113, .35); }
+
+.stageDots .dot.on[data-stage="2"],
+.stageDots .dot.active[data-stage="2"] { background: rgba(241, 196, 15, .22); border-color: rgba(241, 196, 15, .50); color:#fff; }
+.stageDots .dot.active[data-stage="2"] { box-shadow: 0 0 18px rgba(241, 196, 15, .35); }
+
+.stageDots .dot.on[data-stage="3"],
+.stageDots .dot.active[data-stage="3"] { background: rgba(243, 156, 18, .22); border-color: rgba(243, 156, 18, .50); color:#fff; }
+.stageDots .dot.active[data-stage="3"] { box-shadow: 0 0 18px rgba(243, 156, 18, .35); }
+
+.stageDots .dot.on[data-stage="4"],
+.stageDots .dot.active[data-stage="4"] { background: rgba(231, 76, 60, .20); border-color: rgba(231, 76, 60, .50); color:#fff; }
+.stageDots .dot.active[data-stage="4"] { box-shadow: 0 0 18px rgba(231, 76, 60, .35); }
+
+.stageDots .dot.on[data-stage="5"],
+.stageDots .dot.active[data-stage="5"] { background: rgba(142, 68, 173, .22); border-color: rgba(142, 68, 173, .50); color:#fff; }
+.stageDots .dot.active[data-stage="5"] { box-shadow: 0 0 18px rgba(142, 68, 173, .35); }
 
 
 
