@@ -1,23 +1,6 @@
 // public/app.js
 
 // ============================
-// ✅ Logo clicável: recarrega
-// ============================
-document.addEventListener("DOMContentLoaded", () => {
-  const logo = document.getElementById("lamsaLogo");
-  if (!logo) return;
-
-  logo.style.cursor = "pointer";
-  logo.addEventListener("click", () => window.location.reload());
-  logo.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      window.location.reload();
-    }
-  });
-});
-
-// ============================
 // ✅ KEYWORDS EDITÁVEL (com persistência)
 // ============================
 const DEFAULT_KEYWORDS = ["Lamsa", "Avenida Brasil", "Trânsito Rio de Janeiro", "Cet Rio Lamsa"];
@@ -27,23 +10,21 @@ const KW_STORAGE_KEY = "radar_keywords_v1";
 // ✅ LIMITES / JANELA
 // ============================
 const MAX_RESULTS_PER_KEYWORD = 2;
-
-// total fica dinâmico: keywords.length * MAX_RESULTS_PER_KEYWORD (com teto)
 const MAX_TOTAL_ITEMS_CAP = 60;
-
-// últimas 48h (se quiser mais “vida”, sobe pra 72/168)
 const MAX_AGE_HOURS = 48;
 
 // ============================
 // Sites permitidos (vai pro backend /search)
 // ============================
-const SITE_FILTER = ["g1.globo.com",
+const SITE_FILTER = [
+  "g1.globo.com",
   "oglobo.globo.com",
   "diariodorio.com",
   "r7.com",
   "band.uol.com.br",
   "cnnbrasil.com.br",
-  "odia.ig.com.br"];
+  "odia.ig.com.br",
+];
 
 // ============================
 // ✅ BLOCKLIST
@@ -53,7 +34,6 @@ const BLOCKLIST_PATH_CONTAINS = [];
 
 // ============================
 // ✅ Fallbacks (só quando vier 0 resultados)
-// - Isso ajuda quando “LAMSA” / “CET” não aparecem literal nas manchetes.
 // ============================
 const KW_FALLBACKS = {
   Lamsa: ["LAMSA", "Linha Amarela", "concessionária Linha Amarela"],
@@ -68,7 +48,9 @@ const KW_FALLBACKS = {
 const PROD_API = "https://radaroperacional-api.onrender.com"; // <- TROQUE AQUI
 
 const API_BASE =
-  location.hostname === "localhost" || location.hostname === "127.0.0.1" ? "http://localhost:3000" : PROD_API;
+  location.hostname === "localhost" || location.hostname === "127.0.0.1"
+    ? "http://localhost:3000"
+    : PROD_API;
 
 // ============================
 // ✅ GOOGLE MAPS (Dark) — apenas front
@@ -277,8 +259,6 @@ function isLiveItem(item, hours = 3) {
   return diffH >= 0 && diffH <= hours;
 }
 
-// ✅ DEDUPE “REAL”: por URL (ou título+fonte), SEM keyword.
-// Assim, a mesma notícia pode carregar várias keywords no MESMO card.
 function makeDedupeKey(item) {
   const url = normalizeUrl(item?.url || "");
   const title = String(item?.title || "").trim().toLowerCase();
@@ -436,9 +416,34 @@ function setupInfiniteMarquee({ speedPxPerSec = 55, minCards = 24 } = {}) {
 }
 
 // ============================
+// ===== Refresh automático do Waze (Live reforçado) =====
+// ============================
+function refreshWazeIframe() {
+  const iframe = document.querySelector(".mapEl");
+  if (!iframe) return;
+
+  const url = new URL(iframe.src);
+  url.searchParams.set("_t", String(Date.now())); // evita cache
+  iframe.src = url.toString();
+}
+
+// ============================
 // App
 // ============================
 document.addEventListener("DOMContentLoaded", () => {
+  // ✅ Logo clicável: recarrega
+  const logo = document.getElementById("lamsaLogo");
+  if (logo) {
+    logo.style.cursor = "pointer";
+    logo.addEventListener("click", () => window.location.reload());
+    logo.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        window.location.reload();
+      }
+    });
+  }
+
   const els = {
     kwInput: document.getElementById("kwInput"),
     kwAdd: document.getElementById("kwAdd"),
@@ -466,6 +471,36 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!els.results || !els.kwChips) {
     console.error("IDs obrigatórios não encontrados no HTML (kwChips/results).");
     return;
+  }
+
+  // ============================
+  // Estágio (COR.RIO)
+  // ============================
+  function setEstagio(n) {
+    n = Math.max(1, Math.min(5, Number(n) || 1));
+
+    const elNum = document.getElementById("stageNumber");
+    if (elNum) elNum.textContent = n;
+
+    document.querySelectorAll(".stageDots .dot").forEach((btn) => {
+      const s = Number(btn.dataset.stage);
+      btn.classList.toggle("on", s <= n);      // acende até o estágio atual
+      btn.classList.toggle("active", s === n); // atual mais forte
+    });
+  }
+
+  async function loadCorEstagio() {
+    try {
+      // precisa existir no backend (Render): GET /cor/estagio  -> { estagio: 1..5 }
+      const r = await fetch(`${API_BASE}/cor/estagio`, { cache: "no-store" });
+      if (!r.ok) throw new Error();
+      const j = await r.json();
+
+      if (j?.estagio) setEstagio(j.estagio);
+    } catch (e) {
+      // fallback: mantém o que já está na tela (ou seta 1)
+      // setEstagio(1);
+    }
   }
 
   // total dinâmico: garante “justiça” quando você adiciona keywords
@@ -621,9 +656,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const openUrl = r.publisherUrl || r.url || "#";
 
       const kws =
-        Array.isArray(r.keywords) && r.keywords.length
-          ? r.keywords
-          : [r.keyword || "Linha Amarela"];
+        Array.isArray(r.keywords) && r.keywords.length ? r.keywords : [r.keyword || "Linha Amarela"];
 
       const kwChipsHtml = kws
         .filter(Boolean)
@@ -681,7 +714,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return res.json();
   }
 
-  // ✅ tenta keyword + fallbacks (só se vier 0)
   async function searchWebWithFallbacks(originalKw) {
     const tryList = [originalKw, ...(KW_FALLBACKS[originalKw] || [])];
 
@@ -691,9 +723,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await searchWeb(q);
         const results = Array.isArray(data?.results) ? data.results : [];
         if (results.length > 0) return results;
-      } catch (e) {
-        // se falhou, tenta o próximo fallback
-      }
+      } catch {}
       if (t < tryList.length - 1) await sleep(180);
     }
     return [];
@@ -714,7 +744,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const key = makeDedupeKey(item);
 
-    // ✅ se já existe: mescla keywords no MESMO card
     const existingIdx = todayItems.findIndex((x) => makeDedupeKey(x) === key);
     if (existingIdx !== -1) {
       const existing = todayItems[existingIdx];
@@ -783,7 +812,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (isBlockedUrl(rawUrl)) return;
 
           pushToday({
-            keyword: k, // ✅ sempre “carimba” a keyword original
+            keyword: k,
             title: r.title || "",
             snippet: r.snippet || r.description || "",
             source: r.source || "Fonte",
@@ -836,58 +865,35 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-// ===== Refresh automático do Waze (Live reforçado) =====
-function refreshWazeIframe() {
-  const iframe = document.querySelector(".mapEl");
-  if (!iframe) return;
-
-  const url = new URL(iframe.src);
-  url.searchParams.set("_t", String(Date.now())); // evita cache
-  iframe.src = url.toString();
-}
-
-// refresh logo ao abrir (2s depois)
-setTimeout(refreshWazeIframe, 2000);
-
-// atualiza periodicamente
-setInterval(refreshWazeIframe, 3 * 60 * 1000);
-
-  
-  // ===== Init =====
+  // ============================
+  // Init
+  // ============================
   renderKeywords();
   renderResults();
   setStatus("idle");
 
+  // Waze refresh
+  setTimeout(refreshWazeIframe, 2000);
+  setInterval(refreshWazeIframe, 3 * 60 * 1000);
+
+  // Clima
   loadWeather();
   setInterval(loadWeather, 5 * 60 * 1000);
 
+  // Estágio (COR) — se backend estiver pronto, ele vai sobrepor o default
+  setEstagio(2); // default (só pra não ficar vazio)
+  loadCorEstagio();
+  setInterval(loadCorEstagio, 2 * 60 * 1000);
+
+  // Maps
   initGoogleMapIfPossible();
   setTimeout(initGoogleMapIfPossible, 1000);
 
+  // Notícias
   runScan();
   setInterval(runScan, 5 * 60 * 1000);
 
-function setEstagio(n) {
-  n = Math.max(1, Math.min(5, Number(n) || 1));
-
-  // número no círculo
-  const elNum = document.getElementById("stageNumber");
-  if (elNum) elNum.textContent = n;
-
-  // bolinhas: acende até n, e destaca a atual
-  document.querySelectorAll(".stageDots .dot").forEach(btn => {
-    const s = Number(btn.dataset.stage);
-    btn.classList.toggle("on", s <= n);       // acesas até o estágio atual
-    btn.classList.toggle("active", s === n);  // a atual mais forte
-  });
-}
-
-  // bolinhas 1–5
-  document.querySelectorAll(".stageDots .dot").forEach(btn => {
-    btn.classList.toggle("active", Number(btn.dataset.stage) === Number(n));
-  });
-}
-
+  // Resize Maps
   window.addEventListener("resize", () => {
     if (__mapInstance) {
       try {
@@ -897,9 +903,4 @@ function setEstagio(n) {
       } catch {}
     }
   });
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  loadWeather();
-  setEstagio(2);
 });
