@@ -907,6 +907,14 @@ async function loadWeather() {
   runScan();
   setInterval(runScan, 5 * 60 * 1000);
 
+// Ctrl + Shift + K: mostra/oculta o painel de buscas (modo admin)
+document.addEventListener("keydown", (e) => {
+  if (e.ctrlKey && e.shiftKey && (e.key === "k" || e.key === "K")) {
+    e.preventDefault();
+    document.querySelector(".keywordsPanel")?.classList.toggle("is-open");
+  }
+});
+  
   // Resize Maps
   window.addEventListener("resize", () => {
     if (__mapInstance) {
