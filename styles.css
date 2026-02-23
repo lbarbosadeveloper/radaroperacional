@@ -911,6 +911,48 @@ body.kw-open .topRow{
   outline-offset: 2px;
   transform: scale(1.04);
 }
+/* ===== mini-selos: imagem via variável, cor separada ===== */
+.stageDots .dot{
+  /* imagem */
+  background-image: var(--stageImg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* cor NÃO pode usar "background:" */
+  background-color: transparent !important;
+
+  border: 0;
+  border-radius: 999px;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  cursor: pointer;
+
+  /* esconde o número */
+  color: transparent;
+  font-size: 0;
+
+  /* default: PB (não alcançado) */
+  filter: grayscale(100%);
+  opacity: .55;
+  transition: filter .25s ease, opacity .25s ease, transform .2s ease;
+}
+
+/* alcançados: coloridos */
+.stageDots .dot.on{
+  filter: none !important;
+  opacity: .95 !important;
+}
+
+/* atual: destaque */
+.stageDots .dot.active{
+  filter: none !important;
+  opacity: 1 !important;
+  outline: 2px solid rgba(255,255,255,.85);
+  outline-offset: 2px;
+  transform: scale(1.04);
+}
 
 
 
