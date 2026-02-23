@@ -497,7 +497,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 🔥 coloca as imagens nos botões (uma vez)
   document.querySelectorAll(".stageDots .dot").forEach((btn) => {
   const s = Number(btn.dataset.stage);
-  btn.style.backgroundImage = `url(${stageImages[s]})`;
+  btn.style.setProperty("--stageImg", `url(${stageImages[s]})`);
 });
 
   function setEstagio(n, { persist = true } = {}) {
