@@ -491,13 +491,7 @@ function setEstagio(n) {
 
   if (j?.estagio) setEstagio(j.estagio);
     } catch (e) {
-const rgbMap = {
-  1: "46,204,113",
-  2: "241,196,15",
-  3: "243,156,18",
-  4: "231,76,60",
-  5: "142,68,173",
-};
+
 
   async function loadCorEstagio() {
     try {
