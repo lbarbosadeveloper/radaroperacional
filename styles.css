@@ -880,6 +880,37 @@ body.kw-open .topRow{
   opacity: 1;
   transform: scale(1.05);
 }
+/* ===== Estágios (mini-selos) - lógica de cor ===== */
+
+/* base: sempre mostrar a imagem */
+.stageDots .dot{
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: transparent; /* evita “pintar por cima” */
+  border: 0;
+}
+
+/* por padrão: PB (ainda não alcançado) */
+.stageDots .dot{
+  filter: grayscale(100%);
+  opacity: .55;
+}
+
+/* alcançados: coloridos de verdade */
+.stageDots .dot.on{
+  filter: none !important;
+  opacity: .95 !important;
+}
+
+/* atual: mais forte */
+.stageDots .dot.active{
+  filter: none !important;
+  opacity: 1 !important;
+  outline: 2px solid rgba(255,255,255,.85);
+  outline-offset: 2px;
+  transform: scale(1.04);
+}
 
 
 
