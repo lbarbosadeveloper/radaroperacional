@@ -76,52 +76,53 @@
           </section>
         </section>
 
-<!-- CLIMA -->
-<section class="panel weatherPanel">
-  <div class="panelHead">
-    <h2>Clima</h2>
-  </div>
+        <!-- CLIMA -->
+        <section class="panel weatherPanel">
+          <div class="panelHead">
+            <h2>Clima</h2>
+          </div>
 
-  <div class="weather">
+          <div class="weather">
 
-    <div class="weatherTop">
-      <div class="temp" id="wTemp">--°</div>
-      <div class="place">
-        <div class="placeTitle" id="wPlace">Carregando...</div>
-        <div class="placeSub" id="wCond">—</div>
-      </div>
-    </div>
+            <div class="weatherTop">
+              <div class="temp" id="wTemp">--°</div>
+              <div class="place">
+                <div class="placeTitle" id="wPlace">Carregando...</div>
+                <div class="placeSub" id="wCond">—</div>
+              </div>
+            </div>
 
-    <!-- ESTÁGIO CENTRAL -->
-    <div class="stageWrapper">
-  <img id="stageBadge" class="stageBadge" src="./assets/estagio-2.png" alt="Estágio operacional">
-</div>
-<!-- RÉGUA DOS ESTÁGIOS (1–5) -->
-<div class="stageDots" id="stageDots">
-  <button class="dot active" data-stage="1" aria-label="Estágio 1">1</button>
-  <button class="dot" data-stage="2" aria-label="Estágio 2">2</button>
-  <button class="dot" data-stage="3" aria-label="Estágio 3">3</button>
-  <button class="dot" data-stage="4" aria-label="Estágio 4">4</button>
-  <button class="dot" data-stage="5" aria-label="Estágio 5">5</button>
-</div>
+            <!-- ✅ ESTÁGIO + TEXTO (lado a lado) -->
+            <div class="stageRow">
+              <!-- círculo principal (menor) -->
+              <div class="stageWrapper">
+                <img id="stageBadge" class="stageBadge" src="./assets/estagio-2.png" alt="Estágio operacional">
+              </div>
 
-    
-  
+              <!-- texto do estágio -->
+              <div class="stageInfo">
+                <div class="stageInfoTitle">Quando:</div>
+                <div id="stageInfoText" class="stageInfoText">—</div>
+              </div>
+            </div>
 
-  </div> 
-</section> 
+            <!-- RÉGUA DOS ESTÁGIOS (1–5) -->
+            <div class="stageDots" id="stageDots">
+              <button class="dot active" data-stage="1" aria-label="Estágio 1">1</button>
+              <button class="dot" data-stage="2" aria-label="Estágio 2">2</button>
+              <button class="dot" data-stage="3" aria-label="Estágio 3">3</button>
+              <button class="dot" data-stage="4" aria-label="Estágio 4">4</button>
+              <button class="dot" data-stage="5" aria-label="Estágio 5">5</button>
+            </div>
+
+          </div>
+        </section>
 
         <!-- ✅ MAPA (WAZE LIVE MAP - COM TRÂNSITO) -->
         <section class="panel mapPanel">
-          <div class="panelHead">
-            </div>
+          <div class="panelHead"></div>
 
           <div class="mapWrap">
-            <!--
-              ✅ Troque LAT/LON pelo ponto exato do pedágio (quando você tiver).
-              Por enquanto deixei o mesmo ponto do clima (Água Santa).
-              zoom: 14~17 costuma ficar bom.
-            -->
             <iframe
               class="mapEl"
               title="Mapa Waze - Trânsito"
