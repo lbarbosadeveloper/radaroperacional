@@ -146,7 +146,7 @@ body{
   position: relative;
   flex: 1 1 auto;
   height: 100%;
-  min-height: 260px; /* altura mínima pro mapa ficar lindo */
+  min-height: 300px; /* altura mínima pro mapa ficar lindo */
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid rgba(170,220,255,.14);
@@ -813,6 +813,7 @@ body{
 .keywordsPanel {
   display: none !important;
 }
+
 
 
 
