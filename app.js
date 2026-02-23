@@ -961,3 +961,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+document.querySelectorAll(".dot").forEach(btn => {
+  btn.disabled = true;
+});
