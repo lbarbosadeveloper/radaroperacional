@@ -296,4 +296,20 @@ app.listen(PORT, () => {
   console.log(`API online na porta ${PORT}`);
 });
 
+app.get("/api/cor/estagio", async (req, res) => {
+  try {
+    const url = "https://cor.rio/ultimas-noticias/";
+    const r = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
+    if (!r.ok) throw new Error("Falha ao buscar COR");
+    const html = await r.text();
+
+    // pega o PRIMEIRO “Estágio X” que aparecer na página
+    const m = html.match(/Est[aá]gio\s*(\d)/i);
+    const estagio = m ? Number(m[1]) : null;
+
+    res.json({ estagio, fonte: url, atualizadoEm: new Date().toISOString() });
+  } catch (e) {
+    res.status(500).json({ estagio: null, erro: "indisponivel" });
+  }
+});
 
