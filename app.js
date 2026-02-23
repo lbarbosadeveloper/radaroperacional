@@ -888,3 +888,8 @@ setInterval(refreshWazeIframe, 3 * 60 * 1000);
     }
   });
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadWeather();
+  setEstagio(2);
+});
