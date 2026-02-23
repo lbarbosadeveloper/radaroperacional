@@ -961,6 +961,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-document.querySelectorAll(".dot").forEach(btn => {
+  document.querySelectorAll(".dot").forEach(btn => {
   btn.disabled = true;
+  btn.style.cursor = "default";
 });
