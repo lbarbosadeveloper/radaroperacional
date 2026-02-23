@@ -498,6 +498,15 @@ function setEstagio(n) {
 
       if (j?.estagio) setEstagio(j.estagio);
     } catch (e) {
+const rgbMap = {
+  1: "46,204,113",
+  2: "241,196,15",
+  3: "243,156,18",
+  4: "231,76,60",
+  5: "142,68,173",
+};
+document.documentElement.style.setProperty("--stageRGB", rgbMap[n]);
+      
       // fallback: mantém o que já está na tela (ou seta 1)
       // setEstagio(1);
     }
