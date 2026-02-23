@@ -159,8 +159,8 @@ body{
 /* (mantém compatibilidade caso você use div #map em algum momento) */
 .mapEl,
 #map{
-  width: 2000px;
-  height: 2000px;
+  width: 100%;
+  height: 100%;
 }
 
 /* ✅ WAZE DARK + 100% FIX (sem borda, sem scroll estranho) */
@@ -809,10 +809,11 @@ body{
   background: radial-gradient(circle at 30% 25%, rgba(var(--stageRGB), .95), rgba(var(--stageRGB), .75));
   box-shadow: 0 0 30px rgba(var(--stageRGB), .35);
 }
-/* Esconde o painel de Buscas */
-.keywordsPanel {
-  display: none !important;
-}
+/* Escondido por padrão */
+.keywordsPanel { display: none; }
+
+/* Abre quando você quiser */
+.keywordsPanel.is-open { display: block; }
 
 
 
