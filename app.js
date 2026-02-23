@@ -849,29 +849,26 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===== Clima =====
-  async function loadWeather() {
-    try {
-      const lat = -22.8749;
-      const lon = -43.3096;
+async function loadWeather() {
+  try {
+    const lat = -22.8749;
+    const lon = -43.3096;
 
-      const res = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&timezone=America/Sao_Paulo`
-      );
-      if (!res.ok) throw new Error();
+    const res = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&timezone=America/Sao_Paulo`
+    );
+    if (!res.ok) throw new Error();
 
-      const c = (await res.json()).current;
+    const c = (await res.json()).current;
 
-      els.wTemp.textContent = `${Math.round(c.temperature_2m)}°`;
-      els.wWind.textContent = `${Math.round(c.wind_speed_10m)} km/h`;
-      els.wHum.textContent = `${Math.round(c.relative_humidity_2m)}%`;
-      els.wFeels.textContent = `${Math.round(c.apparent_temperature)}°`;
-      els.wPlace.textContent = "Água Santa • RJ";
-      els.wUpdated.textContent = new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
-    } catch {
-      els.wPlace.textContent = "Clima indisponível";
-      els.wUpdated.textContent = new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
-    }
+    els.wTemp.textContent = `${Math.round(c.temperature_2m)}°`;
+    els.wPlace.textContent = "Água Santa • RJ";
+  } catch {
+    // NÃO muda o local
+    els.wTemp.textContent = "--°";
+    els.wPlace.textContent = "Água Santa • RJ";
   }
+}
 
   // ============================
   // Init
