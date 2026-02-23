@@ -92,12 +92,17 @@ body{
 }
 
 /* ✅ TOP ROW: 3 colunas (Buscas | Clima | Mapa) */
+/* TOP ROW: por padrão fica só Clima + Mapa */
 .topRow{
-  display:grid;
-  grid-template-columns: 380px minmax(320px, 1fr) minmax(420px, 1fr);
-  gap:16px;
+  display: grid;
+  grid-template-columns: 380px 1fr; /* clima fixo, mapa ocupa o resto */
+  gap: 16px;
 }
-.topRow > *{ min-width:0; }
+
+/* Quando o painel de buscas estiver aberto (modo admin), vira 3 colunas */
+body.kw-open .topRow{
+  grid-template-columns: 360px 380px 1fr; /* buscas | clima | mapa */
+}
 
 /* PANELS */
 .panel{
@@ -814,6 +819,7 @@ body{
 
 /* Abre quando você quiser */
 .keywordsPanel.is-open { display: block; }
+
 
 
 
