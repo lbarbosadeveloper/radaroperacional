@@ -1,6 +1,7 @@
 // server.js (API para Render / Railway)
 // - GET /health
 // - GET /search?q=...&sites=dom1,dom2
+// - GET /api/cor/estagio
 //
 // Recomendado: usar esse server separado do GitHub Pages (Pages = front estático)
 
@@ -29,10 +30,6 @@ app.use(
 
       // libera o domínio do pages + variações de porta (local)
       if (ALLOWED_ORIGINS.has(origin)) return cb(null, true);
-
-      // opcional: liberar qualquer subpath do github.io (origin vem só domínio)
-      // se quiser liberar qualquer usuário no github.io, use:
-      // if (origin.endsWith(".github.io")) return cb(null, true);
 
       return cb(new Error("CORS bloqueado: " + origin));
     },
@@ -63,7 +60,9 @@ function decodeEntities(str = "") {
     .replaceAll("&nbsp;", " ");
 
   s = s.replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)));
-  s = s.replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+  s = s.replace(/&#x([0-9a-fA-F]+);/g, (_, hex) =>
+    String.fromCharCode(parseInt(hex, 16))
+  );
 
   return s;
 }
@@ -84,7 +83,10 @@ function pickTag(block, tag) {
 }
 
 function pickAttrTag(block, tag, attrName) {
-  const re = new RegExp(`<${tag}\\b[^>]*${attrName}="([^"]+)"[^>]*>([\\s\\S]*?)<\\/${tag}>`, "i");
+  const re = new RegExp(
+    `<${tag}\\b[^>]*${attrName}="([^"]+)"[^>]*>([\\s\\S]*?)<\\/${tag}>`,
+    "i"
+  );
   const m = block.match(re);
   if (!m) return null;
   return { attr: m[1]?.trim() || "", text: (m[2] || "").trim() };
@@ -159,17 +161,13 @@ function buildGoogleNewsQuery(keyword, sites = []) {
   const k = String(keyword || "").trim();
   if (!k) return "";
 
-  const kFixed = k.includes(" ")
-    ? `"${k.replaceAll('"', '\\"')}"`
-    : k;
+  const kFixed = k.includes(" ") ? `"${k.replaceAll('"', '\\"')}"` : k;
 
   if (!sites.length) return kFixed;
 
   const sitePart = sites.map((d) => `site:${d}`).join(" OR ");
   return `(${kFixed}) (${sitePart})`;
 }
-
-
 
 // ============================
 // ✅ Resolver redirect do Google News -> Publisher real
@@ -194,7 +192,8 @@ async function resolvePublisherFromGoogleNewsUrl(gnUrl, timeoutMs = 4500) {
       signal: controller.signal,
       headers: {
         "User-Agent": "Mozilla/5.0 (RadarOperacional; Node)",
-        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
       },
     });
 
@@ -202,7 +201,8 @@ async function resolvePublisherFromGoogleNewsUrl(gnUrl, timeoutMs = 4500) {
     const host = getHostSafe(finalUrl);
 
     if (!finalUrl) return { publisherUrl: "", publisherDomain: "" };
-    if (isGoogleNewsHost(host) || isGoogleHost(host)) return { publisherUrl: "", publisherDomain: "" };
+    if (isGoogleNewsHost(host) || isGoogleHost(host))
+      return { publisherUrl: "", publisherDomain: "" };
 
     return { publisherUrl: finalUrl, publisherDomain: host };
   } catch {
@@ -224,10 +224,45 @@ async function mapPool(items, concurrency, mapper) {
     }
   }
 
-  const workers = Array.from({ length: Math.max(1, concurrency) }, () => worker());
+  const workers = Array.from({ length: Math.max(1, concurrency) }, () =>
+    worker()
+  );
   await Promise.all(workers);
   return out;
 }
+
+// ============================
+// ✅ COR - Estágio atual (via últimas notícias)
+// ============================
+app.get("/api/cor/estagio", async (req, res) => {
+  try {
+    const url = "https://cor.rio/ultimas-noticias/";
+    const r = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0 (RadarOperacional; Node)" },
+    });
+
+    if (!r.ok) {
+      return res
+        .status(502)
+        .json({ estagio: null, erro: "cor_http_" + r.status });
+    }
+
+    const html = await r.text();
+
+    // pega o PRIMEIRO “Estágio X” que aparecer na página
+    const m = html.match(/Est[aá]gio\s*([1-5])/i);
+    const estagio = m ? Number(m[1]) : null;
+
+    res.set("Cache-Control", "public, max-age=60"); // 1 min
+    return res.json({
+      estagio,
+      fonte: url,
+      atualizadoEm: new Date().toISOString(),
+    });
+  } catch (e) {
+    return res.status(500).json({ estagio: null, erro: "indisponivel" });
+  }
+});
 
 // ============================
 // /search
@@ -253,7 +288,9 @@ app.get("/search", async (req, res) => {
 
     if (!r.ok) {
       console.error("Google RSS HTTP", r.status);
-      return res.status(502).json({ results: [], error: "rss_http_" + r.status });
+      return res
+        .status(502)
+        .json({ results: [], error: "rss_http_" + r.status });
     }
 
     const xml = await r.text();
@@ -288,28 +325,10 @@ app.get("/search", async (req, res) => {
 
 // Root opcional
 app.get("/", (req, res) => {
-  res.send("Radar Operacional API ok. Use /health e /search.");
+  res.send("Radar Operacional API ok. Use /health, /search e /api/cor/estagio.");
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`API online na porta ${PORT}`);
 });
-
-app.get("/api/cor/estagio", async (req, res) => {
-  try {
-    const url = "https://cor.rio/ultimas-noticias/";
-    const r = await fetch(url, { headers: { "User-Agent": "Mozilla/5.0" } });
-    if (!r.ok) throw new Error("Falha ao buscar COR");
-    const html = await r.text();
-
-    // pega o PRIMEIRO “Estágio X” que aparecer na página
-    const m = html.match(/Est[aá]gio\s*(\d)/i);
-    const estagio = m ? Number(m[1]) : null;
-
-    res.json({ estagio, fonte: url, atualizadoEm: new Date().toISOString() });
-  } catch (e) {
-    res.status(500).json({ estagio: null, erro: "indisponivel" });
-  }
-});
-
