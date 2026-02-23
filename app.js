@@ -440,7 +440,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         window.location.reload();
-
+      }
+    });
+  }
 
   const els = {
     kwInput: document.getElementById("kwInput"),
@@ -472,9 +474,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ============================
-  // ✅ Estágio (manual + COR via API do seu backend)
+  // ✅ Estágio (imagem + dots mini-selo)
   // ============================
   const STAGE_STORAGE_KEY = "radar_stage_v1";
+
   const stageImages = {
     1: "./assets/estagio-1.png",
     2: "./assets/estagio-2.png",
@@ -491,6 +494,12 @@ document.addEventListener("DOMContentLoaded", () => {
     5: "142,68,173",
   };
 
+  // 🔥 coloca as imagens nos botões (uma vez)
+  document.querySelectorAll(".stageDots .dot").forEach((btn) => {
+    const s = Number(btn.dataset.stage);
+    btn.style.backgroundImage = `url(${stageImages[s]})`;
+  });
+
   function setEstagio(n, { persist = true } = {}) {
     n = Math.max(1, Math.min(5, Number(n) || 1));
 
@@ -498,28 +507,26 @@ document.addEventListener("DOMContentLoaded", () => {
     const elNum = document.getElementById("stageNumber");
     if (elNum) elNum.textContent = n;
 
-    // imagem (se você trocou pro <img id="stageBadge">)
+    // imagem central (se existir)
     const badge = document.getElementById("stageBadge");
     if (badge) badge.src = stageImages[n] || stageImages[1];
 
-    // dots (seu comportamento)
+    // dots
     document.querySelectorAll(".stageDots .dot").forEach((btn) => {
       const s = Number(btn.dataset.stage);
       btn.classList.toggle("on", s <= n);
       btn.classList.toggle("active", s === n);
     });
 
-    // CSS var para glow/tema (se você usa)
+    // CSS var
     document.documentElement.style.setProperty("--stageRGB", rgbMap[n] || rgbMap[1]);
 
     if (persist) localStorage.setItem(STAGE_STORAGE_KEY, String(n));
   }
 
-  // clique nos dots (bind UMA vez)
+  // clique nos dots
   document.querySelectorAll(".stageDots .dot").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      setEstagio(btn.dataset.stage, { persist: true });
-    });
+    btn.addEventListener("click", () => setEstagio(btn.dataset.stage, { persist: true }));
   });
 
   async function loadCorEstagio() {
@@ -527,12 +534,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const r = await fetch(`${API_BASE}/cor/estagio`, { cache: "no-store" });
       if (!r.ok) throw new Error();
       const j = await r.json();
-      if (j?.estagio) {
-        // veio do backend -> pode sobrescrever (e persistir, pra ficar igual)
-        setEstagio(j.estagio, { persist: true });
-      }
+      if (j?.estagio) setEstagio(j.estagio, { persist: true });
     } catch {
-      // se falhar, não derruba o painel
+      // silêncio
     }
   }
 
@@ -892,12 +896,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (els.wTemp) els.wTemp.textContent = `${Math.round(c.temperature_2m)}°`;
       if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ";
 
-      // ✅ esses dois são os que você quer de volta:
       if (els.wFeels) els.wFeels.textContent = `${Math.round(c.apparent_temperature)}°`;
       if (els.wUpdated)
         els.wUpdated.textContent = new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
     } catch {
-      // fallback sem apagar o local
       if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ";
       if (els.wFeels) els.wFeels.textContent = "—";
       if (els.wUpdated)
@@ -910,18 +912,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ============================
   renderKeywords();
   renderResults();
-  // setStatus("idle"); // você tinha
-  // vou manter igual:
-  const _setStatus = (txt) => {
-    if (els.statusText) els.statusText.textContent = txt;
-    const dot = document.querySelector(".dot");
-    if (!dot) return;
-
-    if (txt.includes("scanning")) dot.style.background = "rgba(125,245,255,.95)";
-    else if (txt.includes("Online")) dot.style.background = "rgba(120,255,190,.9)";
-    else dot.style.background = "rgba(235,245,255,.55)";
-  };
-  _setStatus("idle");
+  setStatus("idle");
 
   // Waze refresh
   setTimeout(refreshWazeIframe, 2000);
@@ -931,7 +922,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadWeather();
   setInterval(loadWeather, 5 * 60 * 1000);
 
-  // Estágio: carrega do storage primeiro, depois tenta backend COR
+  // Estágio (storage -> COR)
   const savedStage = Number(localStorage.getItem(STAGE_STORAGE_KEY) || 2);
   setEstagio(savedStage, { persist: false });
   loadCorEstagio();
@@ -946,7 +937,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(runScan, 5 * 60 * 1000);
 
   // Ctrl + Shift + K: mostra/oculta o painel de buscas (modo admin)
-  // e ajusta o layout pra o mapa ocupar o espaço quando fechado
   document.addEventListener("keydown", (e) => {
     const isShortcut = e.ctrlKey && e.shiftKey && (e.key === "k" || e.key === "K");
     if (!isShortcut) return;
@@ -957,8 +947,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!panel) return;
 
     panel.classList.toggle("is-open");
-
-    // ✅ controla o layout (2 colunas vs 3 colunas)
     document.body.classList.toggle("kw-open", panel.classList.contains("is-open"));
   });
 
