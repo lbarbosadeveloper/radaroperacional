@@ -483,11 +483,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (elNum) elNum.textContent = n;
 
     document.querySelectorAll(".stageDots .dot").forEach((btn) => {
-      const s = Number(btn.dataset.stage);
-      btn.classList.toggle("on", s <= n);      // acende até o estágio atual
-      btn.classList.toggle("active", s === n); // atual mais forte
-    });
-
+      btn.addEventListener("click", () => {
+      setStage(btn.dataset.stage);
+      });
+      
     const rgbMap = {
       1: "46,204,113",
       2: "241,196,15",
@@ -935,3 +934,25 @@ document.addEventListener("keydown", (e) => {
     }
   });
 });
+const stageImages = {
+  1: "./assets/estagio-1.png",
+  2: "./assets/estagio-2.png",
+  3: "./assets/estagio-3.png",
+  4: "./assets/estagio-4.png",
+  5: "./assets/estagio-5.png",
+};
+
+function setStage(n) {
+  n = Math.max(1, Math.min(5, Number(n) || 1));
+
+  // troca a imagem
+  const badge = document.getElementById("stageBadge");
+  if (badge) badge.src = stageImages[n];
+
+  // atualiza os dots (seu código, igualzinho)
+  document.querySelectorAll(".stageDots .dot").forEach((btn) => {
+    const s = Number(btn.dataset.stage);
+    btn.classList.toggle("on", s <= n);
+    btn.classList.toggle("active", s === n);
+  });
+}
