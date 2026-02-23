@@ -908,11 +908,20 @@ async function loadWeather() {
   setInterval(runScan, 5 * 60 * 1000);
 
 // Ctrl + Shift + K: mostra/oculta o painel de buscas (modo admin)
+// e ajusta o layout pra o mapa ocupar o espaço quando fechado
 document.addEventListener("keydown", (e) => {
-  if (e.ctrlKey && e.shiftKey && (e.key === "k" || e.key === "K")) {
-    e.preventDefault();
-    document.querySelector(".keywordsPanel")?.classList.toggle("is-open");
-  }
+  const isShortcut = e.ctrlKey && e.shiftKey && (e.key === "k" || e.key === "K");
+  if (!isShortcut) return;
+
+  e.preventDefault();
+
+  const panel = document.querySelector(".keywordsPanel");
+  if (!panel) return;
+
+  panel.classList.toggle("is-open");
+
+  // ✅ controla o layout (2 colunas vs 3 colunas)
+  document.body.classList.toggle("kw-open", panel.classList.contains("is-open"));
 });
   
   // Resize Maps
