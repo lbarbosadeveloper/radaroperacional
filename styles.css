@@ -721,6 +721,41 @@ body{
   color:#fff;
   line-height:1;
 }
+.stageDots{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  margin:-6px 0 14px; /* aproxima do círculo */
+}
+
+.stageDots .dot{
+  width:44px;
+  height:44px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.06);
+  color:rgba(255,255,255,.65);
+  font-weight:700;
+  cursor:pointer;
+  transition:transform .15s ease, background .15s ease, box-shadow .15s ease, color .15s ease;
+}
+
+.stageDots .dot:hover{
+  transform:translateY(-1px);
+}
+
+.stageDots .dot.active{
+  background:linear-gradient(145deg,#ffcc00,#f5a400);
+  color:#fff;
+  border-color:rgba(255,255,255,.25);
+  box-shadow:0 0 18px rgba(255,180,0,.35);
+}
+
+.stageDots .dot:disabled{
+  opacity:.35;
+  cursor:default;
+}
 
 
 
