@@ -484,30 +484,29 @@ function setEstagio(n) {
 
   document.querySelectorAll(".stageDots .dot").forEach((btn) => {
     const s = Number(btn.dataset.stage);
-    btn.classList.toggle("on", s <= n);      // acende até o estágio atual
-    btn.classList.toggle("active", s === n); // atual mais forte
+    btn.classList.toggle("on", s <= n);
+    btn.classList.toggle("active", s === n);
   });
+
+  const rgbMap = {
+    1: "46,204,113",
+    2: "241,196,15",
+    3: "243,156,18",
+    4: "231,76,60",
+    5: "142,68,173",
+  };
+  document.documentElement.style.setProperty("--stageRGB", rgbMap[n]);
 }
 
-  if (j?.estagio) setEstagio(j.estagio);
-    } catch (e) {
+async function loadCorEstagio() {
+  try {
+    const r = await fetch(`${API_BASE}/cor/estagio`, { cache: "no-store" });
+    if (!r.ok) throw new Error();
+    const j = await r.json();
 
-
-  async function loadCorEstagio() {
-    try {
-      // precisa existir no backend (Render): GET /cor/estagio  -> { estagio: 1..5 }
-      const r = await fetch(`${API_BASE}/cor/estagio`, { cache: "no-store" });
-      if (!r.ok) throw new Error();
-      const j = await r.json();
-
-      const rgbMap = {
-  1: "46,204,113",
-  2: "241,196,15",
-  3: "243,156,18",
-  4: "231,76,60",
-  5: "142,68,173",
-};
-document.documentElement.style.setProperty("--stageRGB", rgbMap[n]);
+    if (j?.estagio) setEstagio(j.estagio);
+  } catch {}
+}
 
     
       
@@ -905,6 +904,12 @@ document.documentElement.style.setProperty("--stageRGB", rgbMap[n]);
   // Notícias
   runScan();
   setInterval(runScan, 5 * 60 * 1000);
+
+
+setEstagio(2);            // default
+loadCorEstagio();         // puxa do COR
+setInterval(loadCorEstagio, 2 * 60 * 1000);
+
 
   // Resize Maps
   window.addEventListener("resize", () => {
