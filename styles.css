@@ -383,8 +383,9 @@ body.kw-open .topRow{
 }
 
 .stageInfoText{
-  line-height: 1.35;
-  color: rgba(235,245,255,.75);
+  white-space: normal;        /* ✅ permite quebrar linha */
+  overflow-wrap: anywhere;    /* ✅ quebra palavras se precisar */
+  line-height: 1.4;
 }
 
 /* fileira dos mini-selos */
@@ -795,5 +796,6 @@ body.kw-open .topRow{
 /* Escondido por padrão */
 .keywordsPanel { display: none; }
 .keywordsPanel.is-open { display: block; }
+
 
 
