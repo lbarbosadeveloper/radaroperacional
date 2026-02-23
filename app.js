@@ -855,18 +855,27 @@ async function loadWeather() {
     const lon = -43.3096;
 
     const res = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&timezone=America/Sao_Paulo`
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&timezone=America/Sao_Paulo`,
+      { cache: "no-store" }
     );
     if (!res.ok) throw new Error();
 
     const c = (await res.json()).current;
 
-    els.wTemp.textContent = `${Math.round(c.temperature_2m)}°`;
-    els.wPlace.textContent = "Água Santa • RJ";
+    if (els.wTemp) els.wTemp.textContent = `${Math.round(c.temperature_2m)}°`;
+    if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ";
+
+    // ✅ esses dois são os que você quer de volta:
+    if (els.wFeels) els.wFeels.textContent = `${Math.round(c.apparent_temperature)}°`;
+    if (els.wUpdated)
+      els.wUpdated.textContent = new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
+
   } catch {
-    // NÃO muda o local
-    els.wTemp.textContent = "--°";
-    els.wPlace.textContent = "Água Santa • RJ";
+    // fallback sem apagar o local
+    if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ";
+    if (els.wFeels) els.wFeels.textContent = "—";
+    if (els.wUpdated)
+      els.wUpdated.textContent = new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
   }
 }
 
