@@ -867,10 +867,20 @@ setInterval(refreshWazeIframe, 3 * 60 * 1000);
   runScan();
   setInterval(runScan, 5 * 60 * 1000);
 
-  function setEstagio(n){
+function setEstagio(n) {
+  n = Math.max(1, Math.min(5, Number(n) || 1));
+
   // número no círculo
   const elNum = document.getElementById("stageNumber");
   if (elNum) elNum.textContent = n;
+
+  // bolinhas: acende até n, e destaca a atual
+  document.querySelectorAll(".stageDots .dot").forEach(btn => {
+    const s = Number(btn.dataset.stage);
+    btn.classList.toggle("on", s <= n);       // acesas até o estágio atual
+    btn.classList.toggle("active", s === n);  // a atual mais forte
+  });
+}
 
   // bolinhas 1–5
   document.querySelectorAll(".stageDots .dot").forEach(btn => {
