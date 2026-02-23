@@ -496,9 +496,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 🔥 coloca as imagens nos botões (uma vez)
   document.querySelectorAll(".stageDots .dot").forEach((btn) => {
-    const s = Number(btn.dataset.stage);
-    btn.style.backgroundImage = `url(${stageImages[s]})`;
-  });
+  const s = Number(btn.dataset.stage);
+  btn.style.backgroundImage = `url(${stageImages[s]})`;
+});
 
   function setEstagio(n, { persist = true } = {}) {
     n = Math.max(1, Math.min(5, Number(n) || 1));
@@ -513,10 +513,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // dots
     document.querySelectorAll(".stageDots .dot").forEach((btn) => {
-      const s = Number(btn.dataset.stage);
-      btn.classList.toggle("on", s <= n);
-      btn.classList.toggle("active", s === n);
-    });
+  const s = Number(btn.dataset.stage);
+  btn.classList.toggle("on", s <= n);
+  btn.classList.toggle("active", s === n);
+});
 
     // CSS var
     document.documentElement.style.setProperty("--stageRGB", rgbMap[n] || rgbMap[1]);
