@@ -801,5 +801,9 @@ body{
 .stageDots .dot.active[data-stage="5"] { background: rgba(142, 68, 173, .22); border-color: rgba(142, 68, 173, .50); color:#fff; }
 .stageDots .dot.active[data-stage="5"] { box-shadow: 0 0 18px rgba(142, 68, 173, .35); }
 
+.stageCircle{
+  background: radial-gradient(circle at 30% 25%, rgba(var(--stageRGB), .95), rgba(var(--stageRGB), .75));
+  box-shadow: 0 0 30px rgba(var(--stageRGB), .35);
+}
 
 
