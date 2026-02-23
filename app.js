@@ -489,14 +489,7 @@ function setEstagio(n) {
   });
 }
 
-  async function loadCorEstagio() {
-    try {
-      // precisa existir no backend (Render): GET /cor/estagio  -> { estagio: 1..5 }
-      const r = await fetch(`${API_BASE}/cor/estagio`, { cache: "no-store" });
-      if (!r.ok) throw new Error();
-      const j = await r.json();
-
-      if (j?.estagio) setEstagio(j.estagio);
+  if (j?.estagio) setEstagio(j.estagio);
     } catch (e) {
 const rgbMap = {
   1: "46,204,113",
@@ -505,6 +498,15 @@ const rgbMap = {
   4: "231,76,60",
   5: "142,68,173",
 };
+
+  async function loadCorEstagio() {
+    try {
+      // precisa existir no backend (Render): GET /cor/estagio  -> { estagio: 1..5 }
+      const r = await fetch(`${API_BASE}/cor/estagio`, { cache: "no-store" });
+      if (!r.ok) throw new Error();
+      const j = await r.json();
+
+      
 document.documentElement.style.setProperty("--stageRGB", rgbMap[n]);
       
       // fallback: mantém o que já está na tela (ou seta 1)
