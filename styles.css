@@ -861,6 +861,25 @@ body.kw-open .topRow{
   outline: 2px solid rgba(255,255,255,.85);
   outline-offset: 2px;
 }
+/* padrão: tudo começa preto e branco */
+.stageDots .dot {
+  filter: grayscale(100%) brightness(0.7);
+  opacity: .6;
+  transition: filter .3s ease, opacity .3s ease, transform .2s ease;
+}
+
+/* estágios já alcançados */
+.stageDots .dot.on {
+  filter: grayscale(0%);
+  opacity: .9;
+}
+
+/* estágio atual */
+.stageDots .dot.active {
+  filter: grayscale(0%) contrast(1.05) saturate(1.05);
+  opacity: 1;
+  transform: scale(1.05);
+}
 
 
 
