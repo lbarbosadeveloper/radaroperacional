@@ -867,6 +867,17 @@ setInterval(refreshWazeIframe, 3 * 60 * 1000);
   runScan();
   setInterval(runScan, 5 * 60 * 1000);
 
+  function setEstagio(n){
+  // número no círculo
+  const elNum = document.getElementById("stageNumber");
+  if (elNum) elNum.textContent = n;
+
+  // bolinhas 1–5
+  document.querySelectorAll(".stageDots .dot").forEach(btn => {
+    btn.classList.toggle("active", Number(btn.dataset.stage) === Number(n));
+  });
+}
+
   window.addEventListener("resize", () => {
     if (__mapInstance) {
       try {
