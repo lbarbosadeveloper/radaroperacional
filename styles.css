@@ -368,8 +368,8 @@ body.kw-open .topRow{
 /* ✅ caixa do texto do estágio */
 .stageInfo{
   flex:1;
-  min-width: 240px;
-  padding: 12px 14px;
+  min-width:320px;
+  padding: 14px 16px;
   border:1px solid rgba(170,220,255,.14);
   border-radius: 14px;
   background: rgba(8,12,20,.35);
@@ -795,4 +795,5 @@ body.kw-open .topRow{
 /* Escondido por padrão */
 .keywordsPanel { display: none; }
 .keywordsPanel.is-open { display: block; }
+
 
