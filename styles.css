@@ -159,7 +159,7 @@ body{
 /* (mantém compatibilidade caso você use div #map em algum momento) */
 .mapEl,
 #map{
-  width: 2000%;
+  width: 2000px;
   height: 2000px;
 }
 
@@ -813,6 +813,7 @@ body{
 .keywordsPanel {
   display: none !important;
 }
+
 
 
 
