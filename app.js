@@ -440,10 +440,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         window.location.reload();
-document.querySelectorAll(".stageDots .dot").forEach((btn) => {
-  const s = Number(btn.dataset.stage);
-  btn.style.backgroundImage = `url(${stageImages[s]})`;
-});
+
 
   const els = {
     kwInput: document.getElementById("kwInput"),
