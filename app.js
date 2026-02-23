@@ -509,8 +509,7 @@ function setEstagio(n) {
 };
 document.documentElement.style.setProperty("--stageRGB", rgbMap[n]);
 
-      
-document.documentElement.style.setProperty("--stageRGB", rgbMap[n]);
+    
       
       // fallback: mantém o que já está na tela (ou seta 1)
       // setEstagio(1);
