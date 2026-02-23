@@ -474,37 +474,67 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ============================
-  // Estágio (COR.RIO)
+  // ✅ Estágio (manual + COR via API do seu backend)
   // ============================
-  function setEstagio(n) {
+  const STAGE_STORAGE_KEY = "radar_stage_v1";
+  const stageImages = {
+    1: "./assets/estagio-1.png",
+    2: "./assets/estagio-2.png",
+    3: "./assets/estagio-3.png",
+    4: "./assets/estagio-4.png",
+    5: "./assets/estagio-5.png",
+  };
+
+  const rgbMap = {
+    1: "46,204,113",
+    2: "241,196,15",
+    3: "243,156,18",
+    4: "231,76,60",
+    5: "142,68,173",
+  };
+
+  function setEstagio(n, { persist = true } = {}) {
     n = Math.max(1, Math.min(5, Number(n) || 1));
 
+    // número (se existir)
     const elNum = document.getElementById("stageNumber");
     if (elNum) elNum.textContent = n;
 
+    // imagem (se você trocou pro <img id="stageBadge">)
+    const badge = document.getElementById("stageBadge");
+    if (badge) badge.src = stageImages[n] || stageImages[1];
+
+    // dots (seu comportamento)
     document.querySelectorAll(".stageDots .dot").forEach((btn) => {
-      btn.addEventListener("click", () => {
-      setStage(btn.dataset.stage);
-      });
-      
-    const rgbMap = {
-      1: "46,204,113",
-      2: "241,196,15",
-      3: "243,156,18",
-      4: "231,76,60",
-      5: "142,68,173",
-    };
-    document.documentElement.style.setProperty("--stageRGB", rgbMap[n]);
+      const s = Number(btn.dataset.stage);
+      btn.classList.toggle("on", s <= n);
+      btn.classList.toggle("active", s === n);
+    });
+
+    // CSS var para glow/tema (se você usa)
+    document.documentElement.style.setProperty("--stageRGB", rgbMap[n] || rgbMap[1]);
+
+    if (persist) localStorage.setItem(STAGE_STORAGE_KEY, String(n));
   }
+
+  // clique nos dots (bind UMA vez)
+  document.querySelectorAll(".stageDots .dot").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setEstagio(btn.dataset.stage, { persist: true });
+    });
+  });
 
   async function loadCorEstagio() {
     try {
       const r = await fetch(`${API_BASE}/cor/estagio`, { cache: "no-store" });
       if (!r.ok) throw new Error();
       const j = await r.json();
-      if (j?.estagio) setEstagio(j.estagio);
+      if (j?.estagio) {
+        // veio do backend -> pode sobrescrever (e persistir, pra ficar igual)
+        setEstagio(j.estagio, { persist: true });
+      }
     } catch {
-      // se falhar, mantém o default (sem derrubar o resto do painel)
+      // se falhar, não derruba o painel
     }
   }
 
@@ -848,42 +878,52 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===== Clima =====
-async function loadWeather() {
-  try {
-    const lat = -22.8749;
-    const lon = -43.3096;
+  async function loadWeather() {
+    try {
+      const lat = -22.8749;
+      const lon = -43.3096;
 
-    const res = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&timezone=America/Sao_Paulo`,
-      { cache: "no-store" }
-    );
-    if (!res.ok) throw new Error();
+      const res = await fetch(
+        `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m&timezone=America/Sao_Paulo`,
+        { cache: "no-store" }
+      );
+      if (!res.ok) throw new Error();
 
-    const c = (await res.json()).current;
+      const c = (await res.json()).current;
 
-    if (els.wTemp) els.wTemp.textContent = `${Math.round(c.temperature_2m)}°`;
-    if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ";
+      if (els.wTemp) els.wTemp.textContent = `${Math.round(c.temperature_2m)}°`;
+      if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ";
 
-    // ✅ esses dois são os que você quer de volta:
-    if (els.wFeels) els.wFeels.textContent = `${Math.round(c.apparent_temperature)}°`;
-    if (els.wUpdated)
-      els.wUpdated.textContent = new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
-
-  } catch {
-    // fallback sem apagar o local
-    if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ";
-    if (els.wFeels) els.wFeels.textContent = "—";
-    if (els.wUpdated)
-      els.wUpdated.textContent = new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
+      // ✅ esses dois são os que você quer de volta:
+      if (els.wFeels) els.wFeels.textContent = `${Math.round(c.apparent_temperature)}°`;
+      if (els.wUpdated)
+        els.wUpdated.textContent = new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
+    } catch {
+      // fallback sem apagar o local
+      if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ";
+      if (els.wFeels) els.wFeels.textContent = "—";
+      if (els.wUpdated)
+        els.wUpdated.textContent = new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
+    }
   }
-}
 
   // ============================
   // Init
   // ============================
   renderKeywords();
   renderResults();
-  setStatus("idle");
+  // setStatus("idle"); // você tinha
+  // vou manter igual:
+  const _setStatus = (txt) => {
+    if (els.statusText) els.statusText.textContent = txt;
+    const dot = document.querySelector(".dot");
+    if (!dot) return;
+
+    if (txt.includes("scanning")) dot.style.background = "rgba(125,245,255,.95)";
+    else if (txt.includes("Online")) dot.style.background = "rgba(120,255,190,.9)";
+    else dot.style.background = "rgba(235,245,255,.55)";
+  };
+  _setStatus("idle");
 
   // Waze refresh
   setTimeout(refreshWazeIframe, 2000);
@@ -893,8 +933,9 @@ async function loadWeather() {
   loadWeather();
   setInterval(loadWeather, 5 * 60 * 1000);
 
-  // Estágio (default + COR)
-  setEstagio(2);
+  // Estágio: carrega do storage primeiro, depois tenta backend COR
+  const savedStage = Number(localStorage.getItem(STAGE_STORAGE_KEY) || 2);
+  setEstagio(savedStage, { persist: false });
   loadCorEstagio();
   setInterval(loadCorEstagio, 2 * 60 * 1000);
 
@@ -906,23 +947,23 @@ async function loadWeather() {
   runScan();
   setInterval(runScan, 5 * 60 * 1000);
 
-// Ctrl + Shift + K: mostra/oculta o painel de buscas (modo admin)
-// e ajusta o layout pra o mapa ocupar o espaço quando fechado
-document.addEventListener("keydown", (e) => {
-  const isShortcut = e.ctrlKey && e.shiftKey && (e.key === "k" || e.key === "K");
-  if (!isShortcut) return;
+  // Ctrl + Shift + K: mostra/oculta o painel de buscas (modo admin)
+  // e ajusta o layout pra o mapa ocupar o espaço quando fechado
+  document.addEventListener("keydown", (e) => {
+    const isShortcut = e.ctrlKey && e.shiftKey && (e.key === "k" || e.key === "K");
+    if (!isShortcut) return;
 
-  e.preventDefault();
+    e.preventDefault();
 
-  const panel = document.querySelector(".keywordsPanel");
-  if (!panel) return;
+    const panel = document.querySelector(".keywordsPanel");
+    if (!panel) return;
 
-  panel.classList.toggle("is-open");
+    panel.classList.toggle("is-open");
 
-  // ✅ controla o layout (2 colunas vs 3 colunas)
-  document.body.classList.toggle("kw-open", panel.classList.contains("is-open"));
-});
-  
+    // ✅ controla o layout (2 colunas vs 3 colunas)
+    document.body.classList.toggle("kw-open", panel.classList.contains("is-open"));
+  });
+
   // Resize Maps
   window.addEventListener("resize", () => {
     if (__mapInstance) {
@@ -934,25 +975,3 @@ document.addEventListener("keydown", (e) => {
     }
   });
 });
-const stageImages = {
-  1: "./assets/estagio-1.png",
-  2: "./assets/estagio-2.png",
-  3: "./assets/estagio-3.png",
-  4: "./assets/estagio-4.png",
-  5: "./assets/estagio-5.png",
-};
-
-function setStage(n) {
-  n = Math.max(1, Math.min(5, Number(n) || 1));
-
-  // troca a imagem
-  const badge = document.getElementById("stageBadge");
-  if (badge) badge.src = stageImages[n];
-
-  // atualiza os dots (seu código, igualzinho)
-  document.querySelectorAll(".stageDots .dot").forEach((btn) => {
-    const s = Number(btn.dataset.stage);
-    btn.classList.toggle("on", s <= n);
-    btn.classList.toggle("active", s === n);
-  });
-}
