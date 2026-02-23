@@ -476,46 +476,42 @@ document.addEventListener("DOMContentLoaded", () => {
   // ============================
   // Estágio (COR.RIO)
   // ============================
-function setEstagio(n) {
-  n = Math.max(1, Math.min(5, Number(n) || 1));
+  function setEstagio(n) {
+    n = Math.max(1, Math.min(5, Number(n) || 1));
 
-  const elNum = document.getElementById("stageNumber");
-  if (elNum) elNum.textContent = n;
+    const elNum = document.getElementById("stageNumber");
+    if (elNum) elNum.textContent = n;
 
-  document.querySelectorAll(".stageDots .dot").forEach((btn) => {
-    const s = Number(btn.dataset.stage);
-    btn.classList.toggle("on", s <= n);
-    btn.classList.toggle("active", s === n);
-  });
+    document.querySelectorAll(".stageDots .dot").forEach((btn) => {
+      const s = Number(btn.dataset.stage);
+      btn.classList.toggle("on", s <= n);      // acende até o estágio atual
+      btn.classList.toggle("active", s === n); // atual mais forte
+    });
 
-  const rgbMap = {
-    1: "46,204,113",
-    2: "241,196,15",
-    3: "243,156,18",
-    4: "231,76,60",
-    5: "142,68,173",
-  };
-  document.documentElement.style.setProperty("--stageRGB", rgbMap[n]);
-}
+    const rgbMap = {
+      1: "46,204,113",
+      2: "241,196,15",
+      3: "243,156,18",
+      4: "231,76,60",
+      5: "142,68,173",
+    };
+    document.documentElement.style.setProperty("--stageRGB", rgbMap[n]);
+  }
 
-async function loadCorEstagio() {
-  try {
-    const r = await fetch(`${API_BASE}/cor/estagio`, { cache: "no-store" });
-    if (!r.ok) throw new Error();
-    const j = await r.json();
-
-    if (j?.estagio) setEstagio(j.estagio);
-  } catch {}
-}
-
-    
-      
-      // fallback: mantém o que já está na tela (ou seta 1)
-      // setEstagio(1);
+  async function loadCorEstagio() {
+    try {
+      const r = await fetch(`${API_BASE}/cor/estagio`, { cache: "no-store" });
+      if (!r.ok) throw new Error();
+      const j = await r.json();
+      if (j?.estagio) setEstagio(j.estagio);
+    } catch {
+      // se falhar, mantém o default (sem derrubar o resto do painel)
     }
   }
 
-  // total dinâmico: garante “justiça” quando você adiciona keywords
+  // ============================
+  // Status + relógio
+  // ============================
   function maxTodayItemsNow() {
     const dynamic = keywords.length * MAX_RESULTS_PER_KEYWORD;
     return Math.min(MAX_TOTAL_ITEMS_CAP, Math.max(20, dynamic));
@@ -892,8 +888,8 @@ async function loadCorEstagio() {
   loadWeather();
   setInterval(loadWeather, 5 * 60 * 1000);
 
-  // Estágio (COR) — se backend estiver pronto, ele vai sobrepor o default
-  setEstagio(2); // default (só pra não ficar vazio)
+  // Estágio (default + COR)
+  setEstagio(2);
   loadCorEstagio();
   setInterval(loadCorEstagio, 2 * 60 * 1000);
 
@@ -904,12 +900,6 @@ async function loadCorEstagio() {
   // Notícias
   runScan();
   setInterval(runScan, 5 * 60 * 1000);
-
-
-setEstagio(2);            // default
-loadCorEstagio();         // puxa do COR
-setInterval(loadCorEstagio, 2 * 60 * 1000);
-
 
   // Resize Maps
   window.addEventListener("resize", () => {
