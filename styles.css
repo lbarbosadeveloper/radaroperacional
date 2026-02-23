@@ -6,12 +6,16 @@
   --stroke: rgba(170,220,255,.18);
   --text: rgba(235,245,255,.92);
   --muted: rgba(235,245,255,.55);
+
+  /* (opcional) usado se você quiser glow por estágio */
+  --stageRGB: 241,196,15;
 }
 
 html, body{
   height: 100%;
   background: var(--bg) !important;
 }
+
 /* RESET */
 *{ box-sizing:border-box; }
 body{
@@ -91,7 +95,6 @@ body{
   gap:16px;
 }
 
-/* ✅ TOP ROW: 3 colunas (Buscas | Clima | Mapa) */
 /* TOP ROW: por padrão fica só Clima + Mapa */
 .topRow{
   display: grid;
@@ -137,7 +140,7 @@ body.kw-open .topRow{
 }
 
 /* =========================
-   ✅ MAPA (Waze / iframe)
+   MAPA (Waze / iframe)
 ========================= */
 .mapPanel{
   padding:16px;
@@ -146,12 +149,11 @@ body.kw-open .topRow{
   gap:12px;
 }
 
-/* dá um "respiro" e garante altura consistente */
 .mapWrap{
   position: relative;
   flex: 1 1 auto;
   height: 100%;
-  min-height: 200px; /* altura mínima pro mapa ficar lindo */
+  min-height: 200px;
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid rgba(170,220,255,.14);
@@ -161,25 +163,20 @@ body.kw-open .topRow{
     inset 0 1px 0 rgba(255,255,255,.05);
 }
 
-/* (mantém compatibilidade caso você use div #map em algum momento) */
 .mapEl,
 #map{
   width: 100%;
   height: 100%;
 }
 
-/* ✅ WAZE DARK + 100% FIX (sem borda, sem scroll estranho) */
 .mapWrap iframe.mapEl{
   display:block;
   width:100%;
   height:100%;
   border:0;
-
-  /* dark "fake", mas fica bem bonito no seu UI */
   filter: invert(1) hue-rotate(180deg) contrast(1.05) saturate(.95);
 }
 
-/* deixa o mapa mais "integrado" ao dark UI */
 .mapWrap::before{
   content:"";
   position:absolute;
@@ -194,7 +191,6 @@ body.kw-open .topRow{
   z-index: 2;
 }
 
-/* garante que o iframe fique abaixo da overlay */
 .mapWrap > #map,
 .mapWrap > .mapEl{
   position: relative;
@@ -341,6 +337,75 @@ body.kw-open .topRow{
 .wValue{ font-weight:800; }
 
 /* =========================
+   ESTÁGIO (IMAGEM CENTRAL + MINI-SELOS)
+========================= */
+
+.stageWrapper{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:24px 0;
+}
+
+/* imagem central */
+.stageBadge{
+  width: 190px;
+  height: 190px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 26px rgba(var(--stageRGB), .22));
+}
+
+/* fileira dos mini-selos */
+.stageDots{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  margin:-6px 0 14px;
+}
+
+.stageDots .dot{
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  border:0;
+  padding:0;
+  cursor:pointer;
+
+  /* imagem vem do JS via CSS var */
+  background-image: var(--stageImg);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  /* estado padrão: ainda não chegou -> PB */
+  filter: grayscale(100%);
+  opacity: .55;
+
+  /* esconde o número do botão */
+  color: transparent;
+  font-size: 0;
+
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+  transition: filter .25s ease, opacity .25s ease, transform .2s ease;
+}
+
+/* alcançados (1..n) -> coloridos */
+.stageDots .dot.on{
+  filter:none;
+  opacity:.9;
+}
+
+/* atual (n) -> destaque */
+.stageDots .dot.active{
+  filter:none;
+  opacity:1;
+  transform:scale(1.05);
+  outline:2px solid rgba(255,255,255,.85);
+  outline-offset:2px;
+}
+
+/* =========================
    RESULTS / CAROUSEL
 ========================= */
 .carousel{
@@ -369,16 +434,13 @@ body.kw-open .topRow{
   transform: translate3d(0,0,0);
 }
 
-/* ✅ Agora os cards são news-card */
 #results > .news-card{
   flex: 0 0 auto;
   width: 400px;
   max-width: 400px;
 }
 
-/* =========================
-   CARD
-========================= */
+/* CARD */
 .news-card{
   position: relative;
   border-radius: 18px;
@@ -416,15 +478,14 @@ body.kw-open .topRow{
   flex-direction: column;
   gap: 8px;
   min-width: 0;
-  align-items: flex-start; /* ✅ evita chip esticar */
+  align-items: flex-start;
 }
 
-/* chips do card (tamanho do conteúdo) */
 .chipCard{
   display:inline-flex;
   align-items:center;
-  width: fit-content;     /* ✅ ajusta na largura do texto */
-  max-width: 100%;        /* ✅ mas não passa do card */
+  width: fit-content;
+  max-width: 100%;
   padding: 8px 12px;
   border-radius: 999px;
   border: 1px solid rgba(150,210,255,.14);
@@ -440,9 +501,9 @@ body.kw-open .topRow{
 .chipCard-url{
   display:inline-flex;
   align-items:center;
-  width: fit-content;     /* ✅ não ocupa a linha inteira */
+  width: fit-content;
   gap: 8px;
-  padding: 7px 10px;      /* ✅ deixa mais "justinho" */
+  padding: 7px 10px;
   color: rgba(235,245,255,.62);
 }
 
@@ -461,7 +522,6 @@ body.kw-open .topRow{
   white-space: nowrap;
 }
 
-/* LIVE */
 .badge-live{
   flex: 0 0 auto;
   padding: 8px 12px;
@@ -495,7 +555,6 @@ body.kw-open .topRow{
   50%{ transform: scale(1.25); opacity:1; }
 }
 
-/* ✅ limitar linhas (título/snippet) */
 .news-title{
   position: relative;
   margin: 6px 0 10px;
@@ -506,7 +565,7 @@ body.kw-open .topRow{
 
   display:-webkit-box;
   -webkit-box-orient:vertical;
-  -webkit-line-clamp:3;  /* ✅ 3 linhas */
+  -webkit-line-clamp:3;
   overflow:hidden;
 }
 
@@ -519,7 +578,7 @@ body.kw-open .topRow{
 
   display:-webkit-box;
   -webkit-box-orient:vertical;
-  -webkit-line-clamp:2;  /* ✅ 2 linhas */
+  -webkit-line-clamp:2;
   overflow:hidden;
 }
 
@@ -566,9 +625,6 @@ body.kw-open .topRow{
 .car-btn.next{ right: 10px; }
 .car-btn:hover{ background: rgba(10,16,26,.85); }
 
-/* =========================
-   SETAS: só no hover do carrossel
-========================= */
 .carousel .car-btn{
   opacity:0;
   pointer-events:none;
@@ -581,9 +637,6 @@ body.kw-open .topRow{
   transform: translateY(-50%) scale(1);
 }
 
-/* =========================
-   MODO MARQUEE INFINITO
-========================= */
 #carousel.is-marquee .car-viewport{
   overflow: hidden;
   position: relative;
@@ -607,7 +660,7 @@ body.kw-open .topRow{
 
 @media (max-width: 720px){
   .car-btn{ display:none; }
-  .carousel .car-btn{ display:none; } /* garante no mobile */
+  .carousel .car-btn{ display:none; }
   .car-viewport{ padding: 0 12px; }
   #results > .news-card{ width: 86vw; max-width: 86vw; }
   .kw-text{ max-width: 60vw; }
@@ -641,9 +694,7 @@ body.kw-open .topRow{
   max-width: 520px;
 }
 
-/* =========================
-   RESULTADOS: meta + botão
-========================= */
+/* RESULTADOS: meta + botão */
 .resultsTitle{
   display:flex;
   flex-direction:column;
@@ -665,9 +716,7 @@ body.kw-open .topRow{
   font-weight:800;
 }
 
-/* =========================
-   CHIP DE TEMPO (mini)
-========================= */
+/* CHIP DE TEMPO (mini) */
 .chipRow{
   display:flex;
   gap:8px;
@@ -693,272 +742,7 @@ body.kw-open .topRow{
   opacity:.8;
   font-size:12px;
 }
-.stageWrapper{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  margin:24px 0;
-}
 
-.stageCircle{
-  width:120px;
-  height:120px;
-  border-radius:50%;
-  background:linear-gradient(145deg,#ffcc00,#f5a400);
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  box-shadow:0 0 30px rgba(255,180,0,.35);
-  border:6px solid rgba(255,255,255,.15);
-}
-
-.stageLabel{
-  font-size:16px;
-  font-weight:600;
-  letter-spacing:2px;
-  color:#fff;
-}
-
-.stageNumber{
-  font-size:70px;
-  font-weight:800;
-  color:#fff;
-  line-height:1;
-}
-.stageDots{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:10px;
-  margin:-6px 0 14px; /* aproxima do círculo */
-}
-
-.stageDots .dot{
-  width:44px;
-  height:44px;
-  border-radius:999px;
-  border:1px solid rgba(255,255,255,.18);
-  background:rgba(255,255,255,.06);
-  color:rgba(255,255,255,.65);
-  font-weight:700;
-  cursor:pointer;
-  transition:transform .15s ease, background .15s ease, box-shadow .15s ease, color .15s ease;
-}
-
-.stageDots .dot:hover{
-  transform:translateY(-1px);
-}
-
-.stageDots .dot.active{
-  background:linear-gradient(145deg,#ffcc00,#f5a400);
-  color:#fff;
-  border-color:rgba(255,255,255,.25);
-  box-shadow:0 0 18px rgba(255,180,0,.35);
-}
-
-.stageDots .dot:disabled{
-  opacity:.35;
-  cursor:default;
-}
-.stageDots .dot{
-  width:44px;
-  height:44px;
-  border-radius:999px;
-  border:1px solid rgba(255,255,255,.18);
-  background:rgba(255,255,255,.06);
-  color:rgba(255,255,255,.55);
-  font-weight:700;
-}
-
-/* Acesas (1..n) */
-.stageDots .dot.on{
-  background:rgba(255,204,0,.25);
-  border-color:rgba(255,204,0,.35);
-  color:#fff;
-}
-
-/* A atual (n) — mais forte */
-.stageDots .dot.active{
-  background:linear-gradient(145deg,#ffcc00,#f5a400);
-  border-color:rgba(255,255,255,.25);
-  box-shadow:0 0 18px rgba(255,180,0,.35);
-  color:#fff;
-}
-/* ===== Estágios (cores COR) ===== */
-.stageDots .dot.on[data-stage="1"],
-.stageDots .dot.active[data-stage="1"] { background: rgba(46, 204, 113, .22); border-color: rgba(46, 204, 113, .45); color:#fff; }
-.stageDots .dot.active[data-stage="1"] { box-shadow: 0 0 18px rgba(46, 204, 113, .35); }
-
-.stageDots .dot.on[data-stage="2"],
-.stageDots .dot.active[data-stage="2"] { background: rgba(241, 196, 15, .22); border-color: rgba(241, 196, 15, .50); color:#fff; }
-.stageDots .dot.active[data-stage="2"] { box-shadow: 0 0 18px rgba(241, 196, 15, .35); }
-
-.stageDots .dot.on[data-stage="3"],
-.stageDots .dot.active[data-stage="3"] { background: rgba(243, 156, 18, .22); border-color: rgba(243, 156, 18, .50); color:#fff; }
-.stageDots .dot.active[data-stage="3"] { box-shadow: 0 0 18px rgba(243, 156, 18, .35); }
-
-.stageDots .dot.on[data-stage="4"],
-.stageDots .dot.active[data-stage="4"] { background: rgba(231, 76, 60, .20); border-color: rgba(231, 76, 60, .50); color:#fff; }
-.stageDots .dot.active[data-stage="4"] { box-shadow: 0 0 18px rgba(231, 76, 60, .35); }
-
-.stageDots .dot.on[data-stage="5"],
-.stageDots .dot.active[data-stage="5"] { background: rgba(142, 68, 173, .22); border-color: rgba(142, 68, 173, .50); color:#fff; }
-.stageDots .dot.active[data-stage="5"] { box-shadow: 0 0 18px rgba(142, 68, 173, .35); }
-
-.stageCircle{
-  background: radial-gradient(circle at 30% 25%, rgba(var(--stageRGB), .95), rgba(var(--stageRGB), .75));
-  box-shadow: 0 0 30px rgba(var(--stageRGB), .35);
-}
-.stageCircle{
-  background: radial-gradient(circle at 30% 25%, rgba(var(--stageRGB), .95), rgba(var(--stageRGB), .75));
-  box-shadow: 0 0 30px rgba(var(--stageRGB), .35);
-}
 /* Escondido por padrão */
 .keywordsPanel { display: none; }
-
-/* Abre quando você quiser */
 .keywordsPanel.is-open { display: block; }
-
-
-.stageBadge{
-  width: 190px;
-  height: 190px;
-  object-fit: contain;
-}
-
-/* Mini-selos nos dots (1–5) */
-.stageDots .dot{
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-
-  /* some com o número */
-  color: transparent;
-  font-size: 0;
-
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  box-shadow: 0 6px 18px rgba(0,0,0,.35);
-  opacity: .65;
-  transform: scale(.96);
-  transition: transform .15s ease, opacity .15s ease, filter .15s ease;
-}
-
-.stageDots .dot.on{
-  opacity: .9;
-}
-
-.stageDots .dot.active{
-  opacity: 1;
-  transform: scale(1);
-  filter: saturate(1.05) contrast(1.05);
-  outline: 2px solid rgba(255,255,255,.85);
-  outline-offset: 2px;
-}
-/* padrão: tudo começa preto e branco */
-.stageDots .dot {
-  filter: grayscale(100%) brightness(0.7);
-  opacity: .6;
-  transition: filter .3s ease, opacity .3s ease, transform .2s ease;
-}
-
-/* estágios já alcançados */
-.stageDots .dot.on {
-  filter: grayscale(0%);
-  opacity: .9;
-}
-
-/* estágio atual */
-.stageDots .dot.active {
-  filter: grayscale(0%) contrast(1.05) saturate(1.05);
-  opacity: 1;
-  transform: scale(1.05);
-}
-/* ===== Estágios (mini-selos) - lógica de cor ===== */
-
-/* base: sempre mostrar a imagem */
-.stageDots .dot{
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-color: transparent; /* evita “pintar por cima” */
-  border: 0;
-}
-
-/* por padrão: PB (ainda não alcançado) */
-.stageDots .dot{
-  filter: grayscale(100%);
-  opacity: .55;
-}
-
-/* alcançados: coloridos de verdade */
-.stageDots .dot.on{
-  filter: none !important;
-  opacity: .95 !important;
-}
-
-/* atual: mais forte */
-.stageDots .dot.active{
-  filter: none !important;
-  opacity: 1 !important;
-  outline: 2px solid rgba(255,255,255,.85);
-  outline-offset: 2px;
-  transform: scale(1.04);
-}
-/* ===== mini-selos: imagem via variável, cor separada ===== */
-.stageDots .dot{
-  /* imagem */
-  background-image: var(--stageImg);
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  /* cor NÃO pode usar "background:" */
-  background-color: transparent !important;
-
-  border: 0;
-  border-radius: 999px;
-  width: 46px;
-  height: 46px;
-  padding: 0;
-  cursor: pointer;
-
-  /* esconde o número */
-  color: transparent;
-  font-size: 0;
-
-  /* default: PB (não alcançado) */
-  filter: grayscale(100%);
-  opacity: .55;
-  transition: filter .25s ease, opacity .25s ease, transform .2s ease;
-}
-
-/* alcançados: coloridos */
-.stageDots .dot.on{
-  filter: none !important;
-  opacity: .95 !important;
-}
-
-/* atual: destaque */
-.stageDots .dot.active{
-  filter: none !important;
-  opacity: 1 !important;
-  outline: 2px solid rgba(255,255,255,.85);
-  outline-offset: 2px;
-  transform: scale(1.04);
-}
-
-
-
-
-
-
-
-
-
