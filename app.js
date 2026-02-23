@@ -486,6 +486,15 @@ document.addEventListener("DOMContentLoaded", () => {
     5: "./assets/estagio-5.png",
   };
 
+  // ✅ descrições (simples, editável)
+  const ESTAGIOS_DESC = {
+    1: "Condição estável. Sem mudanças relevantes previstas no curto prazo.",
+    2: "Atenção: pode haver mudanças na rotina nas próximas horas e impactos pontuais.",
+    3: "Alerta: cenário com potencial de agravamento. Requer monitoramento reforçado.",
+    4: "Crítico: impactos relevantes. Ações coordenadas de resposta em andamento.",
+    5: "Extremo: risco elevado. Medidas urgentes e máxima mobilização operacional.",
+  };
+
   const rgbMap = {
     1: "46,204,113",
     2: "241,196,15",
@@ -494,11 +503,17 @@ document.addEventListener("DOMContentLoaded", () => {
     5: "142,68,173",
   };
 
+  function renderStageInfo(n) {
+    const el = document.getElementById("stageInfoText");
+    if (!el) return;
+    el.textContent = ESTAGIOS_DESC[n] || "—";
+  }
+
   // 🔥 coloca as imagens nos botões (uma vez)
   document.querySelectorAll(".stageDots .dot").forEach((btn) => {
-  const s = Number(btn.dataset.stage);
-  btn.style.setProperty("--stageImg", `url(${stageImages[s]})`);
-});
+    const s = Number(btn.dataset.stage);
+    btn.style.setProperty("--stageImg", `url(${stageImages[s]})`);
+  });
 
   function setEstagio(n, { persist = true } = {}) {
     n = Math.max(1, Math.min(5, Number(n) || 1));
@@ -507,16 +522,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const elNum = document.getElementById("stageNumber");
     if (elNum) elNum.textContent = n;
 
-    // imagem central (se existir)
+    // imagem central
     const badge = document.getElementById("stageBadge");
     if (badge) badge.src = stageImages[n] || stageImages[1];
 
+    // ✅ texto ao lado
+    renderStageInfo(n);
+
     // dots
     document.querySelectorAll(".stageDots .dot").forEach((btn) => {
-  const s = Number(btn.dataset.stage);
-  btn.classList.toggle("on", s <= n);
-  btn.classList.toggle("active", s === n);
-});
+      const s = Number(btn.dataset.stage);
+      btn.classList.toggle("on", s <= n);
+      btn.classList.toggle("active", s === n);
+    });
 
     // CSS var
     document.documentElement.style.setProperty("--stageRGB", rgbMap[n] || rgbMap[1]);
@@ -524,7 +542,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (persist) localStorage.setItem(STAGE_STORAGE_KEY, String(n));
   }
 
-  // clique nos dots
+  // clique nos dots (se quiser manter clicável, deixa)
   document.querySelectorAll(".stageDots .dot").forEach((btn) => {
     btn.addEventListener("click", () => setEstagio(btn.dataset.stage, { persist: true }));
   });
@@ -550,7 +568,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function setStatus(txt) {
     if (els.statusText) els.statusText.textContent = txt;
-    const dot = document.querySelector(".dot");
+    const dot = document.querySelector(".pill .dot"); // ✅ só o dot do status
     if (!dot) return;
 
     if (txt.includes("scanning")) dot.style.background = "rgba(125,245,255,.95)";
@@ -922,7 +940,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadWeather();
   setInterval(loadWeather, 5 * 60 * 1000);
 
-  // Estágio (storage -> COR)
+  // Estágio
   const savedStage = Number(localStorage.getItem(STAGE_STORAGE_KEY) || 2);
   setEstagio(savedStage, { persist: false });
   loadCorEstagio();
@@ -960,8 +978,11 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch {}
     }
   });
-});
-  document.querySelectorAll(".dot").forEach(btn => {
-  btn.disabled = true;
-  btn.style.cursor = "default";
+
+  // ✅ Se você quiser travar os botões de estágio (não clicar):
+  // (se quiser clicável, apaga esse bloco)
+  document.querySelectorAll(".stageDots .dot").forEach((btn) => {
+    btn.disabled = true;
+    btn.style.cursor = "default";
+  });
 });
