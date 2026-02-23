@@ -696,8 +696,8 @@ body{
 }
 
 .stageCircle{
-  width:100px;
-  height:100px;
+  width:120px;
+  height:120px;
   border-radius:50%;
   background:linear-gradient(145deg,#ffcc00,#f5a400);
   display:flex;
@@ -809,6 +809,7 @@ body{
   background: radial-gradient(circle at 30% 25%, rgba(var(--stageRGB), .95), rgba(var(--stageRGB), .75));
   box-shadow: 0 0 30px rgba(var(--stageRGB), .35);
 }
+
 
 
 
