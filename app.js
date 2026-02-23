@@ -476,18 +476,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // ============================
   // Estágio (COR.RIO)
   // ============================
-  function setEstagio(n) {
-    n = Math.max(1, Math.min(5, Number(n) || 1));
+function setEstagio(n) {
+  n = Math.max(1, Math.min(5, Number(n) || 1));
 
-    const elNum = document.getElementById("stageNumber");
-    if (elNum) elNum.textContent = n;
+  const elNum = document.getElementById("stageNumber");
+  if (elNum) elNum.textContent = n;
 
-    document.querySelectorAll(".stageDots .dot").forEach((btn) => {
-      const s = Number(btn.dataset.stage);
-      btn.classList.toggle("on", s <= n);      // acende até o estágio atual
-      btn.classList.toggle("active", s === n); // atual mais forte
-    });
-  }
+  document.querySelectorAll(".stageDots .dot").forEach((btn) => {
+    const s = Number(btn.dataset.stage);
+    btn.classList.toggle("on", s <= n);      // acende até o estágio atual
+    btn.classList.toggle("active", s === n); // atual mais forte
+  });
+}
 
   async function loadCorEstagio() {
     try {
