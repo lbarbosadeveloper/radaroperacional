@@ -827,6 +827,40 @@ body.kw-open .topRow{
   object-fit: contain;
 }
 
+/* Mini-selos nos dots (1–5) */
+.stageDots .dot{
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+
+  /* some com o número */
+  color: transparent;
+  font-size: 0;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  box-shadow: 0 6px 18px rgba(0,0,0,.35);
+  opacity: .65;
+  transform: scale(.96);
+  transition: transform .15s ease, opacity .15s ease, filter .15s ease;
+}
+
+.stageDots .dot.on{
+  opacity: .9;
+}
+
+.stageDots .dot.active{
+  opacity: 1;
+  transform: scale(1);
+  filter: saturate(1.05) contrast(1.05);
+  outline: 2px solid rgba(255,255,255,.85);
+  outline-offset: 2px;
+}
 
 
 
