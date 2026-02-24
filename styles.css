@@ -793,6 +793,22 @@ body.kw-open .topRow{
 .keywordsPanel { display: none; }
 .keywordsPanel.is-open { display: block; }
 
+@keyframes stageGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(var(--stageRGB), 0.6);
+  }
+  70% {
+    box-shadow: 0 0 0 18px rgba(var(--stageRGB), 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(var(--stageRGB), 0);
+  }
+}
+
+#stageBadge {
+  animation: stageGlow 2s infinite;
+  border-radius: 50%;
+}
 
 
 
