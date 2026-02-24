@@ -873,4 +873,43 @@ body.kw-open .topRow{
 .weatherPanel .weatherMini .wmMax{ color:#ff6b6b; }
 
 
+/* ===== Badge clima (igual ao print) ===== */
+.weatherPanel .weatherMini{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  margin-top: 6px;
+  padding: 3px 8px;           /* mais fininho */
+  border-radius: 4px;         /* cantinho menor, como na foto */
+
+  background: rgba(40, 160, 255, 0.28);
+  border: 1px solid rgba(120, 190, 255, 0.40);
+
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 800;
+  color: rgba(235,245,255,.95);
+
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.weatherPanel .weatherMini .wmEmoji{
+  font-size: 13px;            /* emoji do tamanho certo */
+  line-height: 1;
+  transform: translateY(-1px); /* “assenta” o emoji */
+}
+
+.weatherPanel .weatherMini .wmDay{
+  letter-spacing: .6px;
+}
+
+.weatherPanel .weatherMini .wmMin{
+  color: #7fd4ff;             /* azul claro */
+}
+
+.weatherPanel .weatherMini .wmMax{
+  color: #ff6b6b;             /* vermelho suave */
+}
 
