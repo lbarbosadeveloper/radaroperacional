@@ -98,7 +98,7 @@ body{
 /* TOP ROW: por padrão fica só Clima + Mapa */
 .topRow{
   display: grid;
-  grid-template-columns: 380px 1fr; /* clima fixo, mapa ocupa o resto */
+  grid-template-columns: 400px 1fr; /* clima fixo, mapa ocupa o resto */
   gap: 16px;
 }
 
@@ -792,6 +792,7 @@ body.kw-open .topRow{
 /* Escondido por padrão */
 .keywordsPanel { display: none; }
 .keywordsPanel.is-open { display: block; }
+
 
 
 
