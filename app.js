@@ -489,7 +489,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ✅ descrições (simples, editável)
   const ESTAGIOS_DESC = {
     1: "Em mudanças relevantes previstas no curto prazo.",
-    2: "Pode haver mudanças na rotina nas próximas horas e impactos pontuais.",
+    2: "Há previsão de mudança na rotina da cidade nas próximas horas, ou já há impactos que exigem ações de resposta imediatas.",
     3: "Cenário com potencial de agravamento. Requer monitoramento reforçado.",
     4: "Impactos relevantes. Ações coordenadas de resposta em andamento.",
     5: "Risco elevado. Medidas urgentes e máxima mobilização operacional.",
