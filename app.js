@@ -24,7 +24,8 @@ const SITE_FILTER = [
   "band.uol.com.br",
   "cnnbrasil.com.br",
   "odia.ig.com.br",
-  "mobilidaderio.com.br"
+  "mobilidaderio.com.br",
+  "x.com",
 ];
 
 // ============================
