@@ -810,6 +810,43 @@ body.kw-open .topRow{
   border-radius: 50%;
 }
 
+/* Deixa a “caixa” do clima mais fina (sem mexer no resto do painel) */
+.weatherPanel .weatherTop{
+  padding: 10px 12px;     /* era maior; reduz */
+  min-height: 56px;       /* opcional: deixa mais baixinho */
+  gap: 12px;              /* se tiver gap grande, reduz */
+}
+
+/* Se a temp estiver “gorda” demais, dá uma enxugada leve */
+.weatherPanel .temp{
+  font-size: 26px;        /* ajuste fino: 24–28 costuma ficar bom */
+  line-height: 1;
+}
+
+/* Mini faixa HOJE 23°C 30°C dentro da mesma caixa */
+.weatherPanel .weatherMini{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-top: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+
+  background: rgba(30, 140, 255, 0.22);
+  border: 1px solid rgba(120, 190, 255, 0.28);
+
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(235,245,255,.95);
+
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.weatherPanel .weatherMini .wmDay{ letter-spacing: .6px; }
+.weatherPanel .weatherMini .wmMin{ color:#7fd4ff; }
+.weatherPanel .weatherMini .wmMax{ color:#ff6b6b; }
 
 
 
