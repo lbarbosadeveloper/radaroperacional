@@ -157,16 +157,36 @@ function normalizeDomainList(raw) {
     );
 }
 
-function buildGoogleNewsQuery(keyword, sites = []) {
+// ✅ recência em horas (backend)
+function withinHoursISO(iso, maxH) {
+  if (!iso) return false;
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return false;
+  const diffH = (Date.now() - d.getTime()) / 36e5;
+  return diffH >= 0 && diffH <= maxH;
+}
+
+// ✅ valida domínio real vs lista permitida
+function domainAllowed(host, allowedList) {
+  if (!host) return false;
+  const h = host.replace(/^www\./i, "").toLowerCase();
+  if (!allowedList.length) return true;
+  return allowedList.some((d) => h === d || h.endsWith("." + d));
+}
+
+function buildGoogleNewsQuery(keyword, sites = [], maxAgeHours = 48) {
   const k = String(keyword || "").trim();
   if (!k) return "";
 
   const kFixed = k.includes(" ") ? `"${k.replaceAll('"', '\\"')}"` : k;
 
-  if (!sites.length) return kFixed;
+  // Google Search operator (funciona razoavelmente no RSS do Google News)
+  const whenPart = maxAgeHours ? ` when:${maxAgeHours}h` : "";
+
+  if (!sites.length) return `${kFixed}${whenPart}`;
 
   const sitePart = sites.map((d) => `site:${d}`).join(" OR ");
-  return `(${kFixed}) (${sitePart})`;
+  return `(${kFixed}) (${sitePart})${whenPart}`;
 }
 
 // ============================
@@ -273,7 +293,11 @@ app.get("/search", async (req, res) => {
     if (!q) return res.json({ results: [] });
 
     const sites = normalizeDomainList(req.query.sites);
-    const query = buildGoogleNewsQuery(q, sites);
+
+    // ✅ janela de tempo (padrão 48h)
+    const maxAgeHours = Math.max(1, Math.min(168, Number(req.query.maxAgeHours || 48)));
+
+    const query = buildGoogleNewsQuery(q, sites, maxAgeHours);
 
     const rssUrl =
       `https://news.google.com/rss/search?q=${encodeURIComponent(query)}` +
@@ -294,26 +318,42 @@ app.get("/search", async (req, res) => {
     }
 
     const xml = await r.text();
-    const items = parseRss(xml).filter((it) => it.url && it.title).slice(0, 10);
+
+    // pega um pouco mais antes de filtrar (pra não “matar” variedade)
+    const parsed = parseRss(xml)
+      .filter((it) => it.url && it.title)
+      .slice(0, 25);
 
     // Enriquecer publisherUrl/publisherDomain
-    const enriched = await mapPool(items, 3, async (it) => {
+    const enriched = await mapPool(parsed, 3, async (it) => {
       const host = getHostSafe(it.url);
+
+      // se for link do Google News, resolve para o publisher real
       if (isGoogleNewsHost(host)) {
         const resolved = await resolvePublisherFromGoogleNewsUrl(it.url);
         return { ...it, ...resolved };
       }
+
+      // se já for link direto, usa ele
       return { ...it, publisherUrl: it.url, publisherDomain: getHostSafe(it.url) };
     });
 
-    const results = enriched.map((it) => ({
+    // ✅ filtros que faltavam: domínio real + recência
+    const filtered = enriched
+      .filter((it) => it.publisherUrl && it.publisherDomain)
+      .filter((it) => domainAllowed(it.publisherDomain, sites))
+      .filter((it) => withinHoursISO(it.publishedAt, maxAgeHours))
+      .filter((it) => String(it.title || "").trim());
+
+    // ✅ nunca devolve placeholder vazio
+    const results = filtered.slice(0, 12).map((it) => ({
       title: it.title,
       snippet: it.snippet,
-      source: it.source,
-      url: it.url,
+      source: it.source || it.publisherDomain,
+      url: it.url, // google news (serve como referência)
       publishedAt: it.publishedAt,
-      publisherUrl: it.publisherUrl,
-      publisherDomain: it.publisherDomain,
+      publisherUrl: it.publisherUrl,       // link real (UOL, G1, etc.)
+      publisherDomain: it.publisherDomain, // domínio real
     }));
 
     return res.json({ results });
