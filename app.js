@@ -488,11 +488,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ✅ descrições (simples, editável)
   const ESTAGIOS_DESC = {
-    1: "Em mudanças relevantes previstas no curto prazo.",
+    1: "Não há mudanças na rotina da cidade, nem foram identificados fatores de risco que possam impactar a cidade nas próximas horas.",
     2: "Há previsão de mudança na rotina da cidade nas próximas horas, ou já há impactos que exigem ações de resposta imediatas.",
-    3: "Cenário com potencial de agravamento. Requer monitoramento reforçado.",
-    4: "Impactos relevantes. Ações coordenadas de resposta em andamento.",
-    5: "Risco elevado. Medidas urgentes e máxima mobilização operacional.",
+    3: "Há impactos na rotina de parte da cidade, que exigem ações de resposta integradas.",
+    4: "Há impactos na rotina de grande parte da cidade, que exigem ações de resposta complexas e coordenadas.",
+    5: "Há impactos na rotina da cidade que superam a capacidade de resposta e exigem recursos extraordinários.",
   };
 
   const rgbMap = {
