@@ -11,7 +11,7 @@ const KW_STORAGE_KEY = "radar_keywords_v1";
 // ============================
 const MAX_RESULTS_PER_KEYWORD = 10;
 const MAX_TOTAL_ITEMS_CAP = 60;
-const MAX_AGE_HOURS = 24;
+const MAX_AGE_HOURS = 48;
 
 // ============================
 // Sites permitidos (vai pro backend /search)
