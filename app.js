@@ -17,6 +17,7 @@ const MAX_AGE_HOURS = 48;
 // Sites permitidos (vai pro backend /search)
 // ============================
 const SITE_FILTER = [
+  // Já existentes
   "g1.globo.com",
   "oglobo.globo.com",
   "diariodorio.com",
@@ -26,6 +27,20 @@ const SITE_FILTER = [
   "odia.ig.com.br",
   "mobilidaderio.com.br",
   "x.com",
+
+  // Nacionais adicionados
+  "uol.com.br",
+  "estadao.com.br",
+  "folha.uol.com.br",
+  "valoreconomico.com.br",
+  "metropoles.com",
+
+  // Regionais RJ adicionados
+  "extra.globo.com",
+  "temporealrj.com",
+
+  // Órgãos oficiais
+  "prefeitura.rio"
 ];
 
 // ============================
