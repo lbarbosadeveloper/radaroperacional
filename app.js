@@ -9,9 +9,9 @@ const KW_STORAGE_KEY = "radar_keywords_v1";
 // ============================
 // ✅ LIMITES / JANELA
 // ============================
-const MAX_RESULTS_PER_KEYWORD = 2;
+const MAX_RESULTS_PER_KEYWORD = 10;
 const MAX_TOTAL_ITEMS_CAP = 60;
-const MAX_AGE_HOURS = 48;
+const MAX_AGE_HOURS = 24;
 
 // ============================
 // Sites permitidos (vai pro backend /search)
