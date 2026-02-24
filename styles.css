@@ -848,6 +848,29 @@ body.kw-open .topRow{
 .weatherPanel .weatherMini .wmMin{ color:#7fd4ff; }
 .weatherPanel .weatherMini .wmMax{ color:#ff6b6b; }
 
+.weatherPanel .weatherMini{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+
+  padding: 4px 8px;
+  border-radius: 6px;
+
+  background: rgba(30, 140, 255, 0.22);
+  border: 1px solid rgba(120, 190, 255, 0.28);
+
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(235,245,255,.95);
+
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.weatherPanel .weatherMini .wmDay{ letter-spacing: .6px; }
+.weatherPanel .weatherMini .wmMin{ color:#7fd4ff; }
+.weatherPanel .weatherMini .wmMax{ color:#ff6b6b; }
 
 
 
