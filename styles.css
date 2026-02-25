@@ -1035,3 +1035,8 @@ body.kw-open .topRow{
 .weatherPanel .weatherMini .wmDay{ letter-spacing: .6px; }
 .weatherPanel .weatherMini .wmMin{ color:#7fd4ff; }
 .weatherPanel .weatherMini .wmMax{ color:#ff6b6b; }
+.weatherPanel .weatherTopLine{
+  border-bottom: 1px solid rgba(235,245,255,.18); /* linha discreta (recomendado) */
+  padding-bottom: 12px; /* dá um respiro */
+  margin-bottom: 12px;  /* separa do estágio */
+}
