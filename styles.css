@@ -913,3 +913,61 @@ body.kw-open .topRow{
   color: #ff6b6b;             /* vermelho suave */
 }
 
+/* ===== FIX layout do topo do clima ===== */
+.weatherPanel .weatherTop{
+  display: grid;
+  grid-template-columns: 86px 1fr; /* temp fixa + resto */
+  align-items: center;
+  gap: 14px;
+
+  padding: 10px 12px;  /* deixa a caixa mais fina */
+}
+
+.weatherPanel .temp{
+  font-size: 28px;
+  line-height: 1;
+}
+
+.weatherPanel .place{
+  min-width: 0;              /* evita quebrar layout */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;      /* joga tudo pra direita (igual sua tela) */
+  gap: 4px;
+}
+
+.weatherPanel .placeTitle,
+.weatherPanel .placeSub{
+  text-align: right;
+}
+
+/* ===== Badge igual ao print ===== */
+.weatherPanel .weatherMini{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 3px 8px;
+  border-radius: 4px;
+
+  background: rgba(40, 160, 255, 0.28);
+  border: 1px solid rgba(120, 190, 255, 0.40);
+
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 800;
+  color: rgba(235,245,255,.95);
+
+  white-space: nowrap;        /* impede quebrar linha */
+  align-self: flex-end;       /* gruda na direita */
+}
+
+.weatherPanel .weatherMini .wmEmoji{
+  font-size: 13px;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.weatherPanel .weatherMini .wmDay{ letter-spacing: .6px; }
+.weatherPanel .weatherMini .wmMin{ color:#7fd4ff; }
+.weatherPanel .weatherMini .wmMax{ color:#ff6b6b; }
