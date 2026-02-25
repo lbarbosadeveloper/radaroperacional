@@ -17,7 +17,6 @@ const MAX_AGE_HOURS = 48;
 // Sites permitidos (vai pro backend /search)
 // ============================
 const SITE_FILTER = [
-  // Já existentes
   "g1.globo.com",
   "oglobo.globo.com",
   "diariodorio.com",
@@ -27,20 +26,14 @@ const SITE_FILTER = [
   "odia.ig.com.br",
   "mobilidaderio.com.br",
   "x.com",
-
-  // Nacionais adicionados
   "uol.com.br",
   "estadao.com.br",
   "folha.uol.com.br",
   "valoreconomico.com.br",
   "metropoles.com",
-
-  // Regionais RJ adicionados
   "extra.globo.com",
   "temporealrj.com",
-
-  // Órgãos oficiais
-  "prefeitura.rio"
+  "prefeitura.rio",
 ];
 
 // ============================
@@ -512,7 +505,6 @@ document.addEventListener("DOMContentLoaded", () => {
     5: "./assets/estagio-5.png",
   };
 
-  // ✅ descrições (simples, editável)
   const ESTAGIOS_DESC = {
     1: "Não há mudanças na rotina da cidade, nem foram identificados fatores de risco que possam impactar a cidade nas próximas horas.",
     2: "Há previsão de mudança na rotina da cidade nas próximas horas, ou já há impactos que exigem ações de resposta imediatas.",
@@ -535,7 +527,6 @@ document.addEventListener("DOMContentLoaded", () => {
     el.textContent = ESTAGIOS_DESC[n] || "—";
   }
 
-  // 🔥 coloca as imagens nos botões (uma vez)
   document.querySelectorAll(".stageDots .dot").forEach((btn) => {
     const s = Number(btn.dataset.stage);
     btn.style.setProperty("--stageImg", `url(${stageImages[s]})`);
@@ -544,31 +535,25 @@ document.addEventListener("DOMContentLoaded", () => {
   function setEstagio(n, { persist = true } = {}) {
     n = Math.max(1, Math.min(5, Number(n) || 1));
 
-    // número (se existir)
     const elNum = document.getElementById("stageNumber");
     if (elNum) elNum.textContent = n;
 
-    // imagem central
     const badge = document.getElementById("stageBadge");
     if (badge) badge.src = stageImages[n] || stageImages[1];
 
-    // ✅ texto ao lado
     renderStageInfo(n);
 
-    // dots
     document.querySelectorAll(".stageDots .dot").forEach((btn) => {
       const s = Number(btn.dataset.stage);
       btn.classList.toggle("on", s <= n);
       btn.classList.toggle("active", s === n);
     });
 
-    // CSS var
     document.documentElement.style.setProperty("--stageRGB", rgbMap[n] || rgbMap[1]);
 
     if (persist) localStorage.setItem(STAGE_STORAGE_KEY, String(n));
   }
 
-  // clique nos dots (se quiser manter clicável, deixa)
   document.querySelectorAll(".stageDots .dot").forEach((btn) => {
     btn.addEventListener("click", () => setEstagio(btn.dataset.stage, { persist: true }));
   });
@@ -579,9 +564,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!r.ok) throw new Error();
       const j = await r.json();
       if (j?.estagio) setEstagio(j.estagio, { persist: true });
-    } catch {
-      // silêncio
-    }
+    } catch {}
   }
 
   // ============================
@@ -594,7 +577,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function setStatus(txt) {
     if (els.statusText) els.statusText.textContent = txt;
-    const dot = document.querySelector(".pill .dot"); // ✅ só o dot do status
+    const dot = document.querySelector(".pill .dot");
     if (!dot) return;
 
     if (txt.includes("scanning")) dot.style.background = "rgba(125,245,255,.95)";
@@ -835,8 +818,8 @@ document.addEventListener("DOMContentLoaded", () => {
         Array.isArray(existing.keywords) && existing.keywords.length
           ? existing.keywords
           : existing.keyword
-            ? [existing.keyword]
-            : [];
+          ? [existing.keyword]
+          : [];
 
       const kw = item.keyword || "—";
       if (kw && !existingKws.includes(kw)) existingKws.push(kw);
@@ -924,107 +907,49 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ============================
-  // ===== Clima (Open-Meteo) =====
-  // ✅ Mantém SOMENTE o badge (min/max) e texto
+  // ✅ CLIMA (ClimaTempo via BACKEND /weather)
   // ============================
+  function condToEmoji(text) {
+    const t = String(text || "").toLowerCase();
 
-  function weatherCodeToText(code) {
-    const c = Number(code);
-    if (Number.isNaN(c)) return "—";
+    if (t.includes("graniz")) return "🌨️";
+    if (t.includes("trovo") || t.includes("tempest") || t.includes("raio")) return "⛈️";
+    if (t.includes("chuva") || t.includes("pancad")) return "🌧️";
+    if (t.includes("nebl") || t.includes("névoa")) return "🌫️";
+    if (t.includes("nubl") || t.includes("encob")) return "☁️";
+    if (t.includes("sol")) return "☀️";
 
-    // Mapeamento oficial Open-Meteo (resumo)
-    if (c === 0) return "Céu limpo";
-    if (c === 1) return "Poucas nuvens";
-    if (c === 2) return "Parcialmente nublado";
-    if (c === 3) return "Nublado";
-
-    if (c === 45 || c === 48) return "Neblina";
-
-    if (c === 51 || c === 53 || c === 55) return "Garoa";
-    if (c === 56 || c === 57) return "Garoa congelante";
-
-    if (c === 61 || c === 63 || c === 65) return "Chuva";
-    if (c === 66 || c === 67) return "Chuva congelante";
-
-    if (c === 71 || c === 73 || c === 75) return "Neve";
-    if (c === 77) return "Grãos de neve";
-
-    if (c === 80 || c === 81 || c === 82) return "Pancadas de chuva";
-
-    if (c === 85 || c === 86) return "Pancadas de neve";
-
-    if (c === 95) return "Trovoadas";
-    if (c === 96 || c === 99) return "Trovoadas com granizo";
-
-    return "—";
-  }
-
-  function weatherCodeToEmoji(code) {
-    const c = Number(code);
-    if (Number.isNaN(c)) return "☁️";
-
-    if (c === 0) return "☀️";
-    if (c === 1) return "🌤️";
-    if (c === 2) return "⛅";
-    if (c === 3) return "☁️";
-    if (c === 45 || c === 48) return "🌫️";
-    if ([51,53,55,56,57].includes(c)) return "🌦️";
-    if ([61,63,65,66,67,80,81,82].includes(c)) return "🌧️";
-    if ([71,73,75,77,85,86].includes(c)) return "❄️";
-    if ([95,96,99].includes(c)) return "⛈️";
     return "☁️";
   }
 
   async function loadWeather() {
     try {
-      const lat = -22.8749;
-      const lon = -43.3096;
-
-      const url =
-        `https://api.open-meteo.com/v1/forecast` +
-        `?latitude=${lat}&longitude=${lon}` +
-        `&current=relative_humidity_2m,apparent_temperature,wind_speed_10m` +
-        `&daily=temperature_2m_min,temperature_2m_max,weather_code` +
-        `&timezone=America/Sao_Paulo`;
-
-      const res = await fetch(url, { cache: "no-store" });
-      if (!res.ok) throw new Error("Falha no Open-Meteo");
+      const res = await fetch(`${API_BASE}/weather`, { cache: "no-store" });
+      if (!res.ok) throw new Error("Falha no /weather");
 
       const j = await res.json();
+      if (!j?.ok) throw new Error(j?.error || "Resposta inválida do /weather");
 
-      // Local fixo (como você já fazia)
-      if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ";
+      if (els.wPlace) els.wPlace.textContent = j.place || "Água Santa • RJ";
+      if (els.wCond) els.wCond.textContent = j.cond || "—";
 
-      // Condição do dia (via daily weather_code[0])
-      const code = j?.daily?.weather_code?.[0];
-      const cond = weatherCodeToText(code);
-      if (els.wCond) els.wCond.textContent = cond;
-
-      // ✅ Min/Max do dia (daily)
-      const min = j?.daily?.temperature_2m_min?.[0];
-      const max = j?.daily?.temperature_2m_max?.[0];
-
-      if (els.wMin && min != null) els.wMin.textContent = `⇩  ${Math.round(min)}°C`;
-      if (els.wMax && max != null) els.wMax.textContent = `⇧  ${Math.round(max)}°C`;
-
-      // Dia
       if (els.wDay) els.wDay.textContent = "HOJE";
 
-      // Emoji do clima (pega o segundo emoji do badge, se existir)
+      if (els.wMin && j.min != null) els.wMin.textContent = `↓ ${Math.round(j.min)}°C`;
+      if (els.wMax && j.max != null) els.wMax.textContent = `↑ ${Math.round(j.max)}°C`;
+
+      // emoji do clima: pega o 2º .wmEmoji dentro do weatherMini (o 1º é o quadradinho azul)
       const emojiSpans = els.weatherMini?.querySelectorAll(".wmEmoji");
-      const weatherEmoji = weatherCodeToEmoji(code);
-      if (emojiSpans && emojiSpans.length >= 2) emojiSpans[1].textContent = weatherEmoji;
+      if (emojiSpans && emojiSpans.length >= 2) {
+        emojiSpans[1].textContent = condToEmoji(j.cond);
+      }
 
-      // 🔕 NÃO preencher temperatura grande (27°)
-      if (els.wTemp) els.wTemp.textContent = ""; // pode manter vazio (ou remove do HTML)
+      // NÃO usar mais o número grandão (27° antigo)
+      if (els.wTemp) els.wTemp.textContent = "";
 
-      // Extras (se existirem no HTML)
-      const c = j?.current;
-      if (els.wFeels && c?.apparent_temperature != null) els.wFeels.textContent = `${Math.round(c.apparent_temperature)}°`;
-
-      if (els.wUpdated)
+      if (els.wUpdated) {
         els.wUpdated.textContent = new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
-
+      }
     } catch (e) {
       console.warn("[weather]", e?.message || e);
 
@@ -1033,12 +958,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (els.wMin) els.wMin.textContent = "--°C";
       if (els.wMax) els.wMax.textContent = "--°C";
       if (els.wDay) els.wDay.textContent = "HOJE";
-
       if (els.wTemp) els.wTemp.textContent = "";
-
-      if (els.wFeels) els.wFeels.textContent = "—";
-      if (els.wUpdated)
-        els.wUpdated.textContent = new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
     }
   }
 
