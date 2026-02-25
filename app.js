@@ -925,7 +925,10 @@ document.addEventListener("DOMContentLoaded", () => {
   async function loadWeather() {
     try {
       const res = await fetch(`${API_BASE}/weather`, { cache: "no-store" });
-      if (!res.ok) throw new Error("Falha no /weather");
+      if (!res.ok) {
+        const t = await res.text().catch(() => "");
+        throw new Error(`Falha no /weather HTTP ${res.status}: ${t.slice(0, 150)}`);
+      }
 
       const j = await res.json();
       if (!j?.ok) throw new Error(j?.error || "Resposta inválida do /weather");
@@ -959,6 +962,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (els.wMax) els.wMax.textContent = "--°C";
       if (els.wDay) els.wDay.textContent = "HOJE";
       if (els.wTemp) els.wTemp.textContent = "";
+      if (els.wUpdated) els.wUpdated.textContent = "—";
     }
   }
 
