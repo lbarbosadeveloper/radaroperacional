@@ -1074,8 +1074,9 @@ body.kw-open .topRow{
 .weatherMini .wmDay,
 .weatherMini .wmMin,
 .weatherMini .wmMax{
-  font-size: 25px;
+  font-size: 20px;
   font-weight: 600;
 }
+
 
 
