@@ -934,11 +934,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!j?.ok) throw new Error(j?.error || "Resposta inválida do /weather");
 
       if (els.wPlace) els.wPlace.textContent = j.place || "Água Santa • RJ";
-
-      if (els.wCond) {
-      const base = j.cond || "—";
-      els.wCond.textContent = (j.provider === "wttr.in") ? `${base} (fallback)` : base;
-      }
+      if (els.wCond) els.wCond.textContent = j.cond || "—";
 
       if (els.wDay) els.wDay.textContent = "HOJE";
 
