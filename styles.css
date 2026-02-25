@@ -971,3 +971,67 @@ body.kw-open .topRow{
 .weatherPanel .weatherMini .wmDay{ letter-spacing: .6px; }
 .weatherPanel .weatherMini .wmMin{ color:#7fd4ff; }
 .weatherPanel .weatherMini .wmMax{ color:#ff6b6b; }
+
+/* Linha única do clima */
+.weatherPanel .weatherTopLine{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  padding: 10px 12px;
+  border-radius: 14px; /* se tua caixa tiver borda arredondada */
+}
+
+/* Agrupa cidade + condição do lado esquerdo */
+.weatherPanel .wCity,
+.weatherPanel .wCond{
+  font-weight: 700;
+  font-size: 13px;
+  color: rgba(235,245,255,.92);
+  white-space: nowrap;
+}
+
+.weatherPanel .wSep{
+  opacity: .7;
+  white-space: nowrap;
+}
+
+/* Evita a condição quebrar linha (pancadas de chuva etc) */
+.weatherPanel .wCond{
+  opacity: .9;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 40vw; /* ajusta se quiser mais/menos */
+}
+
+/* Badge igual ao print, sempre numa linha */
+.weatherPanel .weatherMini{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 3px 8px;
+  border-radius: 4px;
+
+  background: rgba(40, 160, 255, 0.28);
+  border: 1px solid rgba(120, 190, 255, 0.40);
+
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 800;
+  color: rgba(235,245,255,.95);
+
+  white-space: nowrap;
+  flex: 0 0 auto; /* não estica */
+}
+
+.weatherPanel .weatherMini .wmEmoji{
+  font-size: 13px;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.weatherPanel .weatherMini .wmDay{ letter-spacing: .6px; }
+.weatherPanel .weatherMini .wmMin{ color:#7fd4ff; }
+.weatherPanel .weatherMini .wmMax{ color:#ff6b6b; }
