@@ -152,4 +152,5 @@ app.get("/weather", async (req, res) => {
 // ============================
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("API on port", PORT));
+app.listen(PORT, () => console.log("🚨 RADAR API NOVA SUBIU — server.js ATUAL — porta", PORT));
+
