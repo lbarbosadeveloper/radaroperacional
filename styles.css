@@ -1040,3 +1040,21 @@ body.kw-open .topRow{
   padding-bottom: 12px; /* dá um respiro */
   margin-bottom: 12px;  /* separa do estágio */
 }
+.weatherPanel .weatherTopLine{
+  position: relative;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: none; /* remove a borda antiga */
+}
+
+/* linha reta, sem herdar border-radius */
+.weatherPanel .weatherTopLine::after{
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+  height: 1px; /* ou 2px se quiser mais forte */
+  background: rgba(235,245,255,.18);
+}
