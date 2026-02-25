@@ -36,6 +36,15 @@ app.use(
 // ============================
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
+app.get("/_whoami", (_req, res) => {
+  res.json({
+    ok: true,
+    build: "RADAR-WHOAMI-001",
+    time: new Date().toISOString()
+  });
+});
+
+
 // ============================
 // ✅ CLIMATEMPO /weather
 // ============================
@@ -153,4 +162,5 @@ app.get("/weather", async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log("🚨 RADAR API NOVA SUBIU — server.js ATUAL — porta", PORT));
+
 
