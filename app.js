@@ -1004,8 +1004,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const min = j?.daily?.temperature_2m_min?.[0];
       const max = j?.daily?.temperature_2m_max?.[0];
 
-      if (els.wMin && min != null) els.wMin.textContent = `+${Math.round(min)}°C`;
-      if (els.wMax && max != null) els.wMax.textContent = `↑${Math.round(max)}°C`;
+      if (els.wMin && min != null) els.wMin.textContent = `MAX${Math.round(min)}°C`;
+      if (els.wMax && max != null) els.wMax.textContent = `MIN${Math.round(max)}°C`;
 
       // Dia
       if (els.wDay) els.wDay.textContent = "HOJE";
