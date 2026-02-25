@@ -1027,7 +1027,7 @@ body.kw-open .topRow{
 }
 
 .weatherPanel .weatherMini .wmEmoji{
-  font-size: 13px;
+  font-size: 16px;
   line-height: 1;
   transform: translateY(-1px);
 }
@@ -1058,3 +1058,4 @@ body.kw-open .topRow{
   height: 1px; /* ou 2px se quiser mais forte */
   background: rgba(235,245,255,.18);
 }
+
