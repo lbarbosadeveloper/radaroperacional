@@ -2,6 +2,14 @@
 import express from "express";
 import cors from "cors";
 
+// ✅ Fallback pro fetch (resolve “clima não aparece” em Node/Render quando fetch não existe)
+// Se seu Node já tiver fetch, isso não atrapalha.
+let _fetch = globalThis.fetch;
+if (!_fetch) {
+  const mod = await import("node-fetch");
+  _fetch = mod.default;
+}
+
 const app = express();
 app.use(express.json({ limit: "1mb" }));
 
@@ -48,7 +56,7 @@ function mustToken() {
 }
 
 async function ctFetchJson(url) {
-  const r = await fetch(url, { headers: { "User-Agent": "radar-operacional/1.0" } });
+  const r = await _fetch(url, { headers: { "User-Agent": "radar-operacional/1.0" } });
   const text = await r.text();
   if (!r.ok) {
     const e = new Error(`ClimaTempo HTTP ${r.status}: ${text.slice(0, 200)}`);
@@ -106,7 +114,7 @@ app.get("/weather", async (req, res) => {
 
     const day0 = forecast?.data?.[0] || null;
 
-    // ClimaTempo costuma trazer texto em PT em algo como text / text_pt / text_phrase (varia por endpoint)
+    // pega o melhor “texto de condição” disponível (ClimaTempo varia chaves)
     const cond =
       current?.data?.condition ||
       current?.data?.text ||
@@ -130,7 +138,6 @@ app.get("/weather", async (req, res) => {
       cond,
       min,
       max,
-      // só pra debug se precisar:
       localeId,
       updatedAt: new Date().toISOString(),
     });
