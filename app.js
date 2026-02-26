@@ -766,18 +766,48 @@ document.addEventListener("DOMContentLoaded", () => {
     setupInfiniteMarquee({ speedPxPerSec: 55, minCards: 24 });
   }
 
-  async function searchWeb(keyword) {
-    const date = todayISO();
-    const sites = SITE_FILTER.length ? `&sites=${encodeURIComponent(SITE_FILTER.join(","))}` : "";
-    const url = `${API_BASE}/search?q=${encodeURIComponent(keyword)}&date=${encodeURIComponent(date)}${sites}`;
+  // ============================
+  // ✅ FIX: busca robusta
+  // - sem "date=hoje" (porque você já filtra no front com MAX_AGE_HOURS)
+  // - sites em lotes para não estourar query
+  // ============================
+  function chunkArray(arr, size) {
+    const out = [];
+    for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+    return out;
+  }
 
-    const res = await fetch(url);
-    if (!res.ok) {
-      const txt = await res.text().catch(() => "");
-      console.warn("Falha /search:", res.status, txt.slice(0, 200));
-      throw new Error(`Erro HTTP ${res.status}`);
+  async function searchWeb(keyword) {
+    const chunkSize = 8; // 6~10 é um bom range
+    const siteChunks = SITE_FILTER.length ? chunkArray(SITE_FILTER, chunkSize) : [[]];
+
+    const all = [];
+
+    for (const chunk of siteChunks) {
+      const sites = chunk.length ? `&sites=${encodeURIComponent(chunk.join(","))}` : "";
+      const url = `${API_BASE}/search?q=${encodeURIComponent(keyword)}${sites}`;
+
+      const res = await fetch(url);
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "");
+        console.warn("Falha /search:", res.status, txt.slice(0, 200), "URL:", url);
+        continue; // não derruba tudo por causa de 1 lote
+      }
+
+      const data = await res.json();
+      const results = Array.isArray(data?.results) ? data.results : [];
+      all.push(...results);
     }
-    return res.json();
+
+    // remove duplicados (por url/link)
+    const uniq = new Map();
+    for (const r of all) {
+      const u = normalizeUrl(r?.url || r?.link || "");
+      const key = u || (String(r?.title || "").trim().toLowerCase() + "::" + String(r?.source || "").trim().toLowerCase());
+      if (!uniq.has(key)) uniq.set(key, r);
+    }
+
+    return { results: [...uniq.values()] };
   }
 
   async function searchWebWithFallbacks(originalKw) {
