@@ -1031,17 +1031,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Waze refresh
   setTimeout(refreshWazeIframe, 2000);
-  setInterval(refreshWazeIframe, 3 * 60 * 1000);
+  setInterval(refreshWazeIframe, 1 * 60 * 1000);
 
   // Clima
   loadWeather();
-  setInterval(loadWeather, 5 * 60 * 1000);
+  setInterval(loadWeather, 25 * 60 * 1000);
 
   // Estágio
   const savedStage = Number(localStorage.getItem(STAGE_STORAGE_KEY) || 2);
   setEstagio(savedStage, { persist: false });
   loadCorEstagio();
-  setInterval(loadCorEstagio, 2 * 60 * 1000);
+  setInterval(loadCorEstagio, 25 * 60 * 1000);
 
   // Maps
   initGoogleMapIfPossible();
@@ -1049,7 +1049,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Notícias
   runScan();
-  setInterval(runScan, 5 * 60 * 1000);
+  setInterval(runScan, 25 * 60 * 1000);
 
   // Ctrl + Shift + K: mostra/oculta o painel de buscas (modo admin)
   document.addEventListener("keydown", (e) => {
