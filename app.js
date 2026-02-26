@@ -949,7 +949,7 @@ document.addEventListener("DOMContentLoaded", () => {
         setKwState(i, "bad");
       }
 
-      await sleep(250);
+      await sleep(900);
     }
 
     renderResults();
