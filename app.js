@@ -314,6 +314,25 @@ function uniquePush(list, item) {
   return true;
 }
 
+// ✅ NOVO: força "busca por frase" quando o termo tiver espaço
+function formatSearchQuery(raw) {
+  const q = normalizeKw(raw);
+  if (!q) return "";
+
+  // se o usuário já colocou aspas, respeita
+  const alreadyQuoted =
+    (q.startsWith('"') && q.endsWith('"')) ||
+    (q.startsWith("“") && q.endsWith("”")) ||
+    (q.startsWith("'") && q.endsWith("'"));
+
+  if (alreadyQuoted) return q;
+
+  // se tiver espaço => frase exata
+  if (q.includes(" ")) return `"${q}"`;
+
+  return q;
+}
+
 function cleanSnippetFront(s) {
   return String(s || "")
     .replace(/<[^>]*>/g, " ")
@@ -783,9 +802,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const all = [];
 
+    // ✅ AQUI: força frase exata quando tiver espaço
+    const query = formatSearchQuery(keyword);
+
     for (const chunk of siteChunks) {
       const sites = chunk.length ? `&sites=${encodeURIComponent(chunk.join(","))}` : "";
-      const url = `${API_BASE}/search?q=${encodeURIComponent(keyword)}${sites}`;
+      const url = `${API_BASE}/search?q=${encodeURIComponent(query)}${sites}`;
 
       const res = await fetch(url);
       if (!res.ok) {
@@ -803,7 +825,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const uniq = new Map();
     for (const r of all) {
       const u = normalizeUrl(r?.url || r?.link || "");
-      const key = u || (String(r?.title || "").trim().toLowerCase() + "::" + String(r?.source || "").trim().toLowerCase());
+      const key =
+        u ||
+        (String(r?.title || "").trim().toLowerCase() +
+          "::" +
+          String(r?.source || "").trim().toLowerCase());
       if (!uniq.has(key)) uniq.set(key, r);
     }
 
