@@ -819,7 +819,7 @@ body.kw-open .topRow{
 
 /* Se a temp estiver “gorda” demais, dá uma enxugada leve */
 .weatherPanel .temp{
-  font-size: 26px;        /* ajuste fino: 24–28 costuma ficar bom */
+  font-size: 30px;        /* ajuste fino: 24–28 costuma ficar bom */
   line-height: 1;
 }
 
@@ -1077,6 +1077,7 @@ body.kw-open .topRow{
   font-size: 15px;
   font-weight: 600;
 }
+
 
 
 
