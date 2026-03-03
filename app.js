@@ -1040,9 +1040,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Estágio
   const savedStage = Number(localStorage.getItem(STAGE_STORAGE_KEY) || 1);
   setEstagio(savedStage, { persist: false });
-  loadCorEstagio();
-  setInterval(loadCorEstagio, 25 * 60 * 1000);
-setEstagio(3, { persist: true });
+  //loadCorEstagio();
+  //setInterval(loadCorEstagio, 25 * 60 * 1000);
+setEstagio(1, { persist: true });
 
 // opcional: comenta pra nunca mais buscar do backend
 // loadCorEstagio();
