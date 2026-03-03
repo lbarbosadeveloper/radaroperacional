@@ -1,176 +1,3 @@
-<!-- index.html -->
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Radar Operacional Lamsa</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-
-  <!-- HEADER FULL WIDTH -->
-  <header class="topbar full">
-    <div class="topbar-inner">
-      <div class="topbar-left">
-        <img
-          src="./assets/lamsa-logo.png"
-          alt="LAMSA"
-          id="lamsaLogo"
-          class="lamsaLogo logo-pulse"
-          role="button"
-          tabindex="0"
-          title="Atualizar página"
-        />
-        <span class="appTitle">Radar Operacional LAMSA</span>
-      </div>
-
-      <div class="topbar-right">
-        <div class="pill">
-          <span class="dot"></span>
-          <span id="statusText">idle</span>
-        </div>
-        <div class="clock" id="clock">--:--:--</div>
-      </div>
-    </div>
-  </header>
-
-  <!-- CONTEÚDO -->
-  <main class="wrap">
-    <section class="gridMain">
-
-      <!-- LINHA DE CIMA -->
-      <section class="topRow">
-
-        <!-- PALAVRAS-CHAVE (EDITÁVEL) -->
-        <section class="panel keywordsPanel">
-          <section class="kw-panel">
-            <div class="kw-head">
-              <h2>Buscas</h2>
-              <div class="kw-actions">
-                <button id="kwClear" class="btn ghost" type="button" title="Limpar tudo">Limpar</button>
-                <button id="kwReset" class="btn ghost" type="button" title="Voltar ao padrão">Padrão</button>
-              </div>
-            </div>
-
-            <div class="kw-inputRow">
-              <div class="kw-inputWrap">
-                <span class="kw-icon">⌕</span>
-                <input
-                  id="kwInput"
-                  class="kw-input"
-                  type="text"
-                  placeholder="Inserir palavras"
-                  autocomplete="off"
-                />
-              </div>
-              <button id="kwAdd" class="btn primary" type="button">+ Adicionar</button>
-            </div>
-
-            <div id="kwChips" class="kw-chips" aria-label="Lista de palavras-chave"></div>
-
-            <div class="kw-foot">
-              <small id="kwCount" class="kw-count">0 palavras-chave</small>
-              <button id="kwCopy" class="btn ghost" type="button">Copiar lista</button>
-            </div>
-          </section>
-        </section>
-
-<!-- CLIMA -->
-<!-- CLIMA -->
-<section class="panel weatherPanel">
-  <div class="panelHead">
-    <h2>Clima</h2>
-  </div>
-
-  <div class="weather">
-    <!-- Linha única -->
-    <div class="weatherTopLine">
-      <span class="wCity" id="wPlace">Carregando...</span>
-      <span class="wSep">•</span>
-      <span class="wCond" id="wCond">—</span>
-
-      <div class="weatherMini" id="weatherMini">
-        <span class="wmEmoji" aria-hidden="true">🌡️</span>
-        <span class="wmDay" id="wDay">HOJE</span>
-        <span class="wmEmoji" aria-hidden="true">☁️</span>
-        <span class="wmMin" id="wMin">--°C</span>
-        <span class="wmMax" id="wMax">--°C</span>
-      </div>
-    </div>
-
-    <!-- ✅ ESTÁGIO + TEXTO -->
-    <div class="stageRow">
-      <div class="stageWrapper">
-        <img id="stageBadge" class="stageBadge" src="./assets/estagio-2.png" alt="Estágio operacional">
-      </div>
-
-      <div class="stageInfo">
-        <div class="stageInfoTitle">Quando:</div>
-        <div id="stageInfoText" class="stageInfoText">—</div>
-      </div>
-    </div>
-
-    <!-- RÉGUA DOS ESTÁGIOS (1–5) -->
-    <div class="stageDots" id="stageDots">
-      <button class="dot active" data-stage="1" aria-label="Estágio 1">1</button>
-      <button class="dot" data-stage="2" aria-label="Estágio 2">2</button>
-      <button class="dot" data-stage="3" aria-label="Estágio 3">3</button>
-      <button class="dot" data-stage="4" aria-label="Estágio 4">4</button>
-      <button class="dot" data-stage="5" aria-label="Estágio 5">5</button>
-    </div>
-  </div>
-</section>
-
-        <!-- ✅ MAPA (WAZE LIVE MAP - COM TRÂNSITO) -->
-        <section class="panel mapPanel">
-          <div class="panelHead"></div>
-
-          <div class="mapWrap">
-            <iframe
-              class="mapEl"
-              title="Mapa Waze - Trânsito"
-              src="https://embed.waze.com/iframe?zoom=15&lat=-22.907054&lon=-43.308952&ct=livemap"
-              width="100%"
-              height="100%"
-              style="border:0; filter: invert(1) hue-rotate(180deg) contrast(1.05) saturate(0.95);"
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
-              allowfullscreen
-            ></iframe>
-          </div>
-        </section>
-
-      </section>
-
-      <!-- RESULTADOS -->
-      <section class="panel resultsPanel">
-        <div class="panelHead resultsHead">
-          <div>
-            <h2>Notícias</h2>
-            <p></p>
-            <small class="hintSmall"></small>
-          </div>
-        </div>
-
-        <div class="carousel" id="carousel">
-          <button class="car-btn prev" id="prevBtn" aria-label="Anterior">‹</button>
-
-          <div class="car-viewport">
-            <div class="results" id="results"></div>
-          </div>
-
-          <button class="car-btn next" id="nextBtn" aria-label="Próximo">›</button>
-        </div>
-      </section>
-
-    </section>
-  </main>
-
-  <script src="./app.js"></script>
-</body>
-</html>
-
 // public/app.js
 
 // ============================
@@ -1151,73 +978,50 @@ document.addEventListener("DOMContentLoaded", () => {
     return "☁️";
   }
 
-  function codeToCondPt(code) {
-  // mapeamento simples WMO
-  if (code === 0) return "Sol";
-  if ([1, 2].includes(code)) return "Parcialmente nublado";
-  if (code === 3) return "Nublado";
-  if ([45, 48].includes(code)) return "Neblina";
-  if ([51,53,55,56,57].includes(code)) return "Garoa";
-  if ([61,63,65,66,67].includes(code)) return "Chuva";
-  if ([71,73,75,77].includes(code)) return "Neve";
-  if ([80,81,82].includes(code)) return "Pancadas";
-  if ([95,96,99].includes(code)) return "Tempestade";
-  return "—";
-}
+  async function loadWeather() {
+    try {
+      const res = await fetch(`${API_BASE}/weather`, { cache: "no-store" });
+      if (!res.ok) {
+        const t = await res.text().catch(() => "");
+        throw new Error(`Falha no /weather HTTP ${res.status}: ${t.slice(0, 150)}`);
+      }
 
-async function loadWeather() {
-  try {
-    // usa o mesmo ponto do teu MAPS.center (ou do WX_DEFAULT)
-    const lat = -22.8749;
-    const lon = -43.3096;
+      const j = await res.json();
+      if (!j?.ok) throw new Error(j?.error || "Resposta inválida do /weather");
 
-    const url =
-      `https://api.open-meteo.com/v1/forecast` +
-      `?latitude=${lat}&longitude=${lon}` +
-      `&current=weather_code` +
-      `&daily=temperature_2m_min,temperature_2m_max` +
-      `&forecast_days=1` +
-      `&timezone=America%2FSao_Paulo`;
+      if (els.wPlace) els.wPlace.textContent = j.place || "Água Santa • RJ";
+      if (els.wCond) els.wCond.textContent = j.cond || "—";
 
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) throw new Error(`Open-Meteo HTTP ${res.status}`);
+      if (els.wDay) els.wDay.textContent = "HOJE";
 
-    const j = await res.json();
+      if (els.wMin && j.min != null) els.wMin.textContent = `↓ ${Math.round(j.min)}°C`;
+      if (els.wMax && j.max != null) els.wMax.textContent = `↑ ${Math.round(j.max)}°C`;
 
-    const code = j?.current?.weather_code;
-    const cond = codeToCondPt(code);
+      // emoji do clima: pega o 2º .wmEmoji dentro do weatherMini (o 1º é o quadradinho azul)
+      const emojiSpans = els.weatherMini?.querySelectorAll(".wmEmoji");
+      if (emojiSpans && emojiSpans.length >= 2) {
+        emojiSpans[1].textContent = condToEmoji(j.cond);
+      }
 
-    const min = j?.daily?.temperature_2m_min?.[0];
-    const max = j?.daily?.temperature_2m_max?.[0];
+      // NÃO usar mais o número grandão (27° antigo)
+      if (els.wTemp) els.wTemp.textContent = "";
 
-    if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ";
-    if (els.wCond) els.wCond.textContent = cond || "—";
-    if (els.wDay) els.wDay.textContent = "HOJE";
+      if (els.wUpdated) {
+        els.wUpdated.textContent = new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
+      }
+    } catch (e) {
+      console.warn("[weather]", e?.message || e);
 
-    if (els.wMin && min != null) els.wMin.textContent = `↓ ${Math.round(min)}°C`;
-    if (els.wMax && max != null) els.wMax.textContent = `↑ ${Math.round(max)}°C`;
-
-    const emojiSpans = els.weatherMini?.querySelectorAll(".wmEmoji");
-    if (emojiSpans && emojiSpans.length >= 2) {
-      emojiSpans[1].textContent = condToEmoji(cond);
+      if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ";
+      if (els.wCond) els.wCond.textContent = "—";
+      if (els.wMin) els.wMin.textContent = "--°C";
+      if (els.wMax) els.wMax.textContent = "--°C";
+      if (els.wDay) els.wDay.textContent = "HOJE";
+      if (els.wTemp) els.wTemp.textContent = "";
+      if (els.wUpdated) els.wUpdated.textContent = "—";
     }
-
-    if (els.wTemp) els.wTemp.textContent = "";
-    if (els.wUpdated) {
-      els.wUpdated.textContent = new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
-    }
-  } catch (e) {
-    console.warn("[weather-front]", e?.message || e);
-
-    if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ";
-    if (els.wCond) els.wCond.textContent = "—";
-    if (els.wMin) els.wMin.textContent = "--°C";
-    if (els.wMax) els.wMax.textContent = "--°C";
-    if (els.wDay) els.wDay.textContent = "HOJE";
-    if (els.wTemp) els.wTemp.textContent = "";
-    if (els.wUpdated) els.wUpdated.textContent = "—";
   }
-}
+
   // ============================
   // Init
   // ============================
