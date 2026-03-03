@@ -966,99 +966,26 @@ document.addEventListener("DOMContentLoaded", () => {
   // ✅ CLIMA (ClimaTempo via BACKEND /weather)
   // ============================
  // ============================
-// ✅ CLIMA (robusto com cache local + timeout)
-// ============================
-const WEATHER_STORAGE_KEY = "radar_weather_last_v1";
-
-function safeSet(el, val) {
-  if (el) el.textContent = val;
-}
-
-function loadLastWeather() {
-  try {
-    const raw = localStorage.getItem(WEATHER_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch {
-    return null;
-  }
-}
-
-function saveLastWeather(data) {
-  try {
-    localStorage.setItem(WEATHER_STORAGE_KEY, JSON.stringify(data));
-  } catch {}
-}
-
-function renderWeather(j, { stale = false } = {}) {
-  safeSet(els.wPlace, j?.place || "Água Santa • RJ");
-
-  const condTxt = j?.cond || "—";
-  safeSet(els.wCond, stale ? `${condTxt} (sem atualizar)` : condTxt);
-
-  safeSet(els.wDay, "HOJE");
-
-  if (els.wMin) els.wMin.textContent = j?.min != null ? `↓ ${Math.round(j.min)}°C` : "--°C";
-  if (els.wMax) els.wMax.textContent = j?.max != null ? `↑ ${Math.round(j.max)}°C` : "--°C";
-
-  // emoji do clima (2º .wmEmoji)
-  const emojiSpans = els.weatherMini?.querySelectorAll(".wmEmoji");
-  if (emojiSpans && emojiSpans.length >= 2) {
-    emojiSpans[1].textContent = condToEmoji(condTxt);
-  }
-
-  // mantém wTemp vazio (como você quer)
-  safeSet(els.wTemp, "");
-
-  // horário de atualização
-  if (els.wUpdated) {
-    const when = stale
-      ? "—"
-      : new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
-    els.wUpdated.textContent = when;
-  }
-}
-
-async function loadWeather() {
-  // 1) pinta algo imediatamente (último cache, se existir)
-  const last = loadLastWeather();
-  if (last) renderWeather(last, { stale: true });
-
-  // 2) tenta buscar novo com timeout
-  const controller = new AbortController();
-  const t = setTimeout(() => controller.abort(), 8000); // 8s
-
-  try {
-    const res = await fetch(`${API_BASE}/weather`, {
-      cache: "no-store",
-      signal: controller.signal,
-    });
-    clearTimeout(t);
-
-    if (!res.ok) {
-      const txt = await res.text().catch(() => "");
-      throw new Error(`Falha no /weather HTTP ${res.status}: ${txt.slice(0, 150)}`);
-    }
-
-    const j = await res.json();
-    if (!j?.ok) throw new Error(j?.error || "Resposta inválida do /weather");
-
-    // salva + renderiza fresco
-    saveLastWeather(j);
-    renderWeather(j, { stale: false });
-  } catch (e) {
-    clearTimeout(t);
-    console.warn("[weather]", e?.message || e);
-
-    // 3) se nem cache tem, aí sim mostra placeholder
-    if (!last) {
-      renderWeather(
-        { place: "Água Santa • RJ", cond: "—", min: null, max: null },
-        { stale: true }
-      );
-    }
-  }
-}
-
+function condToEmoji(text)
+{ const t = String(text || "").toLowerCase(); 
+if (t.includes("graniz")) return "🌨️"; if (t.includes("trovo") ||
+t.includes("tempest") || t.includes("raio")) return "⛈️"; 
+ if (t.includes("chuva") || t.includes("pancad")) return "🌧️";
+ if (t.includes("nebl") || t.includes("névoa")) return "🌫️";
+ if (t.includes("nubl") || t.includes("encob")) return "☁️";
+ if (t.includes("sol")) return "☀️"; return "☁️";
+} async function loadWeather() 
+{ try { const res = await fetch(${API_BASE}/weather,
+{ cache: "no-store" }); if (!res.ok) 
+{ const t = await res.text().catch(() => ""); 
+ throw new Error(Falha no /weather HTTP ${res.status}: ${t.slice(0, 150)}); 
+} const j = await res.json(); if (!j?.ok) throw new Error(j?.error || "Resposta inválida do /weather");
+if (els.wPlace) els.wPlace.textContent = j.place ||
+  "Água Santa • RJ"; if (els.wCond) els.wCond.textContent = j.cond ||
+  "—"; if (els.wDay) els.wDay.textContent = "HOJE";
+if (els.wMin && j.min != null) els.wMin.textContent = ↓ ${Math.round(j.min)}°C; 
+if (els.wMax && j.max != null) els.wMax.textContent = ↑ ${Math.round(j.max)}°C; 
+       // emoji do clima: pega o 2º .wmEmoji dentro do weatherMini (o 1º é o quadradinho azul) const emojiSpans = els.weatherMini?.querySelectorAll(".wmEmoji"); if (emojiSpans && emojiSpans.length >= 2) { emojiSpans[1].textContent = condToEmoji(j.cond); } // NÃO usar mais o número grandão (27° antigo) if (els.wTemp) els.wTemp.textContent = ""; if (els.wUpdated) { els.wUpdated.textContent = new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" }); } } catch (e) { console.warn("[weather]", e?.message || e); if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ"; if (els.wCond) els.wCond.textContent = "—"; if (els.wMin) els.wMin.textContent = "--°C"; if (els.wMax) els.wMax.textContent = "--°C"; if (els.wDay) els.wDay.textContent = "HOJE"; if (els.wTemp) els.wTemp.textContent = ""; if (els.wUpdated) els.wUpdated.textContent = "—"; } }
   // ============================
   // Init
   // ============================
