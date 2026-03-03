@@ -965,104 +965,125 @@ document.addEventListener("DOMContentLoaded", () => {
   // ============================
   // ✅ CLIMA (robusto: cache local + timeout)
   // ============================
-  const WEATHER_STORAGE_KEY = "radar_weather_last_v1";
+// ============================
+// ✅ WEATHER (robusto: timeout maior + fallback + cache)
+// ============================
+let LAST_WEATHER = null; // cache em memória (reseta se reiniciar o servidor)
 
-  function condToEmoji(text) {
-    const t = String(text || "").toLowerCase();
+function withTimeout(ms) {
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), ms);
+  return { controller, done: () => clearTimeout(t) };
+}
 
-    if (t.includes("graniz")) return "🌨️";
-    if (t.includes("trovo") || t.includes("tempest") || t.includes("raio")) return "⛈️";
-    if (t.includes("chuva") || t.includes("pancad")) return "🌧️";
-    if (t.includes("nebl") || t.includes("névoa")) return "🌫️";
-    if (t.includes("nubl") || t.includes("encob")) return "☁️";
-    if (t.includes("sol")) return "☀️";
-
-    return "☁️";
+async function fetchJson(url, { timeoutMs = 15000 } = {}) {
+  const { controller, done } = withTimeout(timeoutMs);
+  try {
+    const r = await fetch(url, { signal: controller.signal, headers: { "User-Agent": "radaroperacional/1.0" } });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return await r.json();
+  } finally {
+    done();
   }
+}
 
-  function safeSet(el, val) {
-    if (el) el.textContent = val;
-  }
+// Provider 1: wttr.in (bem simples)
+async function getWeatherWttr() {
+  // wttr: retorna current_condition e weather (forecast)
+  const url = "https://wttr.in/Rio%20de%20Janeiro?format=j1";
+  const j = await fetchJson(url, { timeoutMs: 15000 });
 
-  function loadLastWeather() {
+  const place = "Água Santa • RJ";
+  const cond = j?.current_condition?.[0]?.weatherDesc?.[0]?.value || "—";
+
+  const today = j?.weather?.[0];
+  const min = Number(today?.mintempC);
+  const max = Number(today?.maxtempC);
+
+  return {
+    ok: true,
+    place,
+    cond,
+    min: Number.isFinite(min) ? min : null,
+    max: Number.isFinite(max) ? max : null,
+    provider: "wttr.in",
+    updatedAt: new Date().toISOString(),
+    stale: false,
+  };
+}
+
+// Provider 2: Open-Meteo (sem chave, bem estável)
+async function getWeatherOpenMeteo() {
+  // coordenadas aproximadas da região (você pode ajustar depois)
+  const lat = -22.8749;
+  const lon = -43.3096;
+
+  const url =
+    `https://api.open-meteo.com/v1/forecast` +
+    `?latitude=${lat}&longitude=${lon}` +
+    `&current=weather_code,temperature_2m` +
+    `&daily=temperature_2m_min,temperature_2m_max` +
+    `&timezone=America%2FSao_Paulo`;
+
+  const j = await fetchJson(url, { timeoutMs: 15000 });
+
+  const place = "Água Santa • RJ";
+  const code = j?.current?.weather_code;
+
+  // map simples de code -> texto (mínimo pra não ficar vazio)
+  const codeToText = (c) => {
+    if (c == null) return "—";
+    if (c === 0) return "Ensolarado";
+    if (c === 1 || c === 2) return "Parcialmente nublado";
+    if (c === 3) return "Nublado";
+    if ([45, 48].includes(c)) return "Névoa";
+    if ([51, 53, 55, 61, 63, 65].includes(c)) return "Chuva";
+    if ([71, 73, 75].includes(c)) return "Neve";
+    if ([95, 96, 99].includes(c)) return "Tempestade";
+    return "Tempo instável";
+  };
+
+  const min = j?.daily?.temperature_2m_min?.[0];
+  const max = j?.daily?.temperature_2m_max?.[0];
+
+  return {
+    ok: true,
+    place,
+    cond: codeToText(code),
+    min: Number.isFinite(min) ? min : null,
+    max: Number.isFinite(max) ? max : null,
+    provider: "open-meteo",
+    updatedAt: new Date().toISOString(),
+    stale: false,
+  };
+}
+
+app.get("/weather", async (req, res) => {
+  try {
+    // tenta provider 1
+    let data = null;
     try {
-      const raw = localStorage.getItem(WEATHER_STORAGE_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
-  }
-
-  function saveLastWeather(data) {
-    try {
-      localStorage.setItem(WEATHER_STORAGE_KEY, JSON.stringify(data));
-    } catch {}
-  }
-
-  function renderWeather(j, { stale = false } = {}) {
-    safeSet(els.wPlace, j?.place || "Água Santa • RJ");
-
-    const condTxt = j?.cond || "—";
-    safeSet(els.wCond, stale ? `${condTxt} (sem atualizar)` : condTxt);
-
-    safeSet(els.wDay, "HOJE");
-
-    if (els.wMin) els.wMin.textContent = j?.min != null ? `↓ ${Math.round(j.min)}°C` : "--°C";
-    if (els.wMax) els.wMax.textContent = j?.max != null ? `↑ ${Math.round(j.max)}°C` : "--°C";
-
-    // emoji do clima: pega o 2º .wmEmoji dentro do weatherMini (o 1º é o quadradinho azul)
-    const emojiSpans = els.weatherMini?.querySelectorAll(".wmEmoji");
-    if (emojiSpans && emojiSpans.length >= 2) {
-      emojiSpans[1].textContent = condToEmoji(condTxt);
+      data = await getWeatherWttr();
+    } catch (e1) {
+      // fallback provider 2
+      data = await getWeatherOpenMeteo();
     }
 
-    // NÃO usar mais o número grandão (27° antigo)
-    safeSet(els.wTemp, "");
-
-    // horário de atualização
-    if (els.wUpdated) {
-      els.wUpdated.textContent = stale
-        ? "—"
-        : new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
+    LAST_WEATHER = data;
+    return res.json(data);
+  } catch (e) {
+    // se tiver cache, devolve cache como stale em vez de ok:false
+    if (LAST_WEATHER?.ok) {
+      return res.json({ ...LAST_WEATHER, stale: true, error: "Provedores indisponíveis (cache)", details: String(e?.message || e) });
     }
+
+    return res.json({
+      ok: false,
+      error: "Falha ao obter clima (provedores indisponíveis).",
+      details: String(e?.message || e),
+    });
   }
-
-  async function loadWeather() {
-    // 1) pinta algo imediato (cache, se existir)
-    const last = loadLastWeather();
-    if (last) renderWeather(last, { stale: true });
-
-    // 2) tenta buscar novo com timeout
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 8000); // 8s
-
-    try {
-      const res = await fetch(`${API_BASE}/weather`, {
-        cache: "no-store",
-        signal: controller.signal,
-      });
-      clearTimeout(timer);
-
-      if (!res.ok) {
-        const t = await res.text().catch(() => "");
-        throw new Error(`Falha no /weather HTTP ${res.status}: ${t.slice(0, 150)}`);
-      }
-
-      const j = await res.json();
-      if (!j?.ok) throw new Error(j?.error || "Resposta inválida do /weather");
-
-      saveLastWeather(j);
-      renderWeather(j, { stale: false });
-    } catch (e) {
-      clearTimeout(timer);
-      console.warn("[weather]", e?.message || e);
-
-      // 3) se não tem cache, mostra placeholder
-      if (!last) {
-        renderWeather({ place: "Água Santa • RJ", cond: "—", min: null, max: null }, { stale: true });
-      }
-    }
-  }
+});
 
   // ============================
   // Init
