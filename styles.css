@@ -1078,6 +1078,10 @@ body.kw-open .topRow{
   font-weight: 600;
 }
 
+.mapEl {
+  transform: rotate(-8deg);
+  transform-origin: center center;
+}
 
 
 
