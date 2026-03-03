@@ -56,6 +56,7 @@ const KW_FALLBACKS = {
 // ✅ API_BASE (local vs GitHub Pages)
 // ============================
 const PROD_API = "https://radaroperacional-api.onrender.com"; // <- TROQUE AQUI
+
 const API_BASE =
   location.hostname === "localhost" || location.hostname === "127.0.0.1"
     ? "http://localhost:3000"
@@ -100,10 +101,7 @@ function loadGoogleMapsScript(key) {
       resolve();
     };
 
-    s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(
-      key
-    )}&callback=__initMapCallback`;
-
+    s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&callback=__initMapCallback`;
     s.onerror = () => reject(new Error("Falha ao carregar Google Maps API."));
     document.head.appendChild(s);
   });
@@ -136,22 +134,19 @@ async function initGoogleMapIfPossible() {
   if (!el) return;
 
   const key = getGoogleMapsKey();
-
   if (!key) {
     console.warn("[Maps] Sem Google Maps API key.");
     if (!el.dataset.mapPlaceholder) {
       el.dataset.mapPlaceholder = "1";
-      el.innerHTML = `
-        <div style="
-          width:100%;height:100%;
-          display:flex;align-items:center;justify-content:center;
-          font: 500 12px system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-          color: rgba(235,245,255,.65);
-          background: rgba(10,16,26,.55);
-          border: 1px solid rgba(170,220,255,.12);
-          border-radius: 16px;
-        ">Google Maps: falta configurar API KEY</div>
-      `;
+      el.innerHTML = `<div style="
+        width:100%;height:100%;
+        display:flex;align-items:center;justify-content:center;
+        font: 500 12px system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        color: rgba(235,245,255,.65);
+        background: rgba(10,16,26,.55);
+        border: 1px solid rgba(170,220,255,.12);
+        border-radius: 16px;
+      ">Google Maps: falta configurar API KEY</div>`;
     }
     return;
   }
@@ -319,7 +314,7 @@ function uniquePush(list, item) {
   return true;
 }
 
-// ✅ força "busca por frase" quando o termo tiver espaço
+// ✅ NOVO: força "busca por frase" quando o termo tiver espaço
 function formatSearchQuery(raw) {
   const q = normalizeKw(raw);
   if (!q) return "";
@@ -332,7 +327,7 @@ function formatSearchQuery(raw) {
 
   if (alreadyQuoted) return q;
 
-  // se tiver espaço => frase exata (aspas)
+  // se tiver espaço => frase exata
   if (q.includes(" ")) return `"${q}"`;
 
   return q;
@@ -356,7 +351,8 @@ function sourceToDomain(sourceText = "") {
 }
 
 function faviconFromDomain(domain, sourceText, fallbackUrl) {
-  const d = String(domain || "").trim() || sourceToDomain(sourceText) || getHost(fallbackUrl) || "news.google.com";
+  const d =
+    String(domain || "").trim() || sourceToDomain(sourceText) || getHost(fallbackUrl) || "news.google.com";
   return `https://www.google.com/s2/favicons?domain=${encodeURIComponent(d)}&sz=64`;
 }
 
@@ -366,6 +362,7 @@ function faviconFromDomain(domain, sourceText, fallbackUrl) {
 let todayItems = [];
 let isScanning = false;
 let pendingRescan = false;
+
 let keywords = loadKeywords();
 let kwStates = new Map();
 
@@ -387,14 +384,12 @@ function setupInfiniteMarquee({ speedPxPerSec = 55, minCards = 24 } = {}) {
 
   carousel.classList.add("is-marquee");
   stopMarquee();
-
   track.style.transform = "translate3d(0,0,0)";
   track.dataset.marqueeReady = "0";
 
   const baseCards = Array.from(track.querySelectorAll(".news-card"));
   if (baseCards.length === 0) return;
 
-  // preenche até minCards
   const fragFill = document.createDocumentFragment();
   let currentCount = baseCards.length;
   while (currentCount < minCards) {
@@ -406,7 +401,6 @@ function setupInfiniteMarquee({ speedPxPerSec = 55, minCards = 24 } = {}) {
   }
   track.appendChild(fragFill);
 
-  // duplica o track pra virar loop
   const nowCards = Array.from(track.querySelectorAll(".news-card"));
   const fragDup = document.createDocumentFragment();
   nowCards.forEach((c) => fragDup.appendChild(c.cloneNode(true)));
@@ -430,7 +424,6 @@ function setupInfiniteMarquee({ speedPxPerSec = 55, minCards = 24 } = {}) {
       if (half > 0 && Math.abs(offset) >= half) offset += half;
       track.style.transform = `translate3d(${offset}px,0,0)`;
     }
-
     marqueeRAF = requestAnimationFrame(tick);
   }
 
@@ -457,6 +450,7 @@ function setupInfiniteMarquee({ speedPxPerSec = 55, minCards = 24 } = {}) {
 function refreshWazeIframe() {
   const iframe = document.querySelector(".mapEl");
   if (!iframe) return;
+
   const url = new URL(iframe.src);
   url.searchParams.set("_t", String(Date.now())); // evita cache
   iframe.src = url.toString();
@@ -490,12 +484,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     resultsMeta: document.getElementById("resultsMeta"),
     refreshBtn: document.getElementById("refreshBtn"),
+
     results: document.getElementById("results"),
     statusText: document.getElementById("statusText"),
     clock: document.getElementById("clock"),
 
     // ⚠️ wTemp existe no HTML, mas NÃO vamos usar mais.
     wTemp: document.getElementById("wTemp"),
+
     wWind: document.getElementById("wWind"),
     wHum: document.getElementById("wHum"),
     wFeels: document.getElementById("wFeels"),
@@ -612,7 +608,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!els.clock) return;
     els.clock.textContent = new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
   }
-
   tickClock();
   setInterval(tickClock, 1000);
 
@@ -633,6 +628,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderKeywords() {
     els.kwChips.innerHTML = "";
+
     keywords.forEach((k, idx) => {
       const chip = document.createElement("div");
       chip.className = "kw-chip";
@@ -670,7 +666,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function addFromInput() {
-    const raw = els.kwInput?.value || "";
+    const raw = els.kwInput.value;
     const items = parseMany(raw);
     if (!items.length) return;
 
@@ -686,14 +682,11 @@ document.addEventListener("DOMContentLoaded", () => {
       runScan();
     }
 
-    if (els.kwInput) {
-      els.kwInput.value = "";
-      els.kwInput.focus();
-    }
+    els.kwInput.value = "";
+    els.kwInput.focus();
   }
 
   els.kwAdd?.addEventListener("click", addFromInput);
-
   els.kwInput?.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -746,7 +739,9 @@ document.addEventListener("DOMContentLoaded", () => {
       card.className = "news-card";
 
       const openUrl = r.publisherUrl || r.url || "#";
-      const kws = Array.isArray(r.keywords) && r.keywords.length ? r.keywords : [r.keyword || "Linha Amarela"];
+
+      const kws =
+        Array.isArray(r.keywords) && r.keywords.length ? r.keywords : [r.keyword || "Linha Amarela"];
 
       const kwChipsHtml = kws
         .filter(Boolean)
@@ -754,11 +749,11 @@ document.addEventListener("DOMContentLoaded", () => {
         .map((k) => `<span class="chipCard">${escapeHtml(k)}</span>`)
         .join("");
 
-      const chip2Text =
-        String(r.source || "").trim() || (r.publisherDomain ? r.publisherDomain : "") || "Fonte";
+      const chip2Text = String(r.source || "").trim() || (r.publisherDomain ? r.publisherDomain : "") || "Fonte";
       const chip2 = escapeHtml(chip2Text);
 
       const iconSrc = faviconFromDomain(r.publisherDomain, r.source, openUrl);
+
       const live = isLiveItem(r, 3);
       const title = escapeHtml(r.title || "(sem título)");
       const snippet = escapeHtml(cleanSnippetFront(r.snippet || ""));
@@ -767,6 +762,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <header class="news-top">
           <div class="news-chips">
             ${kwChipsHtml}
+
             <span class="chipCard chipCard-url">
               <img class="chipIcon" src="${escapeHtml(iconSrc)}" alt="" loading="lazy" />
               <span class="chipLabel">${chip2}</span>
@@ -803,8 +799,10 @@ document.addEventListener("DOMContentLoaded", () => {
   async function searchWeb(keyword) {
     const chunkSize = 8; // 6~10 é um bom range
     const siteChunks = SITE_FILTER.length ? chunkArray(SITE_FILTER, chunkSize) : [[]];
+
     const all = [];
 
+    // ✅ AQUI: força frase exata quando tiver espaço
     const query = formatSearchQuery(keyword);
 
     for (const chunk of siteChunks) {
@@ -828,7 +826,10 @@ document.addEventListener("DOMContentLoaded", () => {
     for (const r of all) {
       const u = normalizeUrl(r?.url || r?.link || "");
       const key =
-        u || (String(r?.title || "").trim().toLowerCase() + "::" + String(r?.source || "").trim().toLowerCase());
+        u ||
+        (String(r?.title || "").trim().toLowerCase() +
+          "::" +
+          String(r?.source || "").trim().toLowerCase());
       if (!uniq.has(key)) uniq.set(key, r);
     }
 
@@ -837,6 +838,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function searchWebWithFallbacks(originalKw) {
     const tryList = [originalKw, ...(KW_FALLBACKS[originalKw] || [])];
+
     for (let t = 0; t < tryList.length; t++) {
       const q = tryList[t];
       try {
@@ -844,7 +846,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const results = Array.isArray(data?.results) ? data.results : [];
         if (results.length > 0) return results;
       } catch {}
-
       if (t < tryList.length - 1) await sleep(180);
     }
     return [];
@@ -864,10 +865,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (norm) item.url = norm;
 
     const key = makeDedupeKey(item);
-    const existingIdx = todayItems.findIndex((x) => makeDedupeKey(x) === key);
 
+    const existingIdx = todayItems.findIndex((x) => makeDedupeKey(x) === key);
     if (existingIdx !== -1) {
       const existing = todayItems[existingIdx];
+
       const existingKws =
         Array.isArray(existing.keywords) && existing.keywords.length
           ? existing.keywords
@@ -880,8 +882,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       existing.keywords = existingKws;
       if (!existing.keyword && kw) existing.keyword = kw;
+
       if (!existing.publisherUrl && item.publisherUrl) existing.publisherUrl = item.publisherUrl;
       if (!existing.publisherDomain && item.publisherDomain) existing.publisherDomain = item.publisherDomain;
+
       return;
     }
 
@@ -890,6 +894,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (kwCount >= MAX_RESULTS_PER_KEYWORD) return;
 
     item.keywords = [kw];
+
     todayItems.unshift(item);
 
     const maxTotal = maxTodayItemsNow();
@@ -949,7 +954,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderResults();
     setStatus("Online");
-
     isScanning = false;
 
     if (pendingRescan) {
@@ -963,19 +967,20 @@ document.addEventListener("DOMContentLoaded", () => {
   // ============================
   function condToEmoji(text) {
     const t = String(text || "").toLowerCase();
+
     if (t.includes("graniz")) return "🌨️";
     if (t.includes("trovo") || t.includes("tempest") || t.includes("raio")) return "⛈️";
     if (t.includes("chuva") || t.includes("pancad")) return "🌧️";
     if (t.includes("nebl") || t.includes("névoa")) return "🌫️";
     if (t.includes("nubl") || t.includes("encob")) return "☁️";
     if (t.includes("sol")) return "☀️";
+
     return "☁️";
   }
 
   async function loadWeather() {
     try {
       const res = await fetch(`${API_BASE}/weather`, { cache: "no-store" });
-
       if (!res.ok) {
         const t = await res.text().catch(() => "");
         throw new Error(`Falha no /weather HTTP ${res.status}: ${t.slice(0, 150)}`);
@@ -986,7 +991,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (els.wPlace) els.wPlace.textContent = j.place || "Água Santa • RJ";
       if (els.wCond) els.wCond.textContent = j.cond || "—";
+
       if (els.wDay) els.wDay.textContent = "HOJE";
+
       if (els.wMin && j.min != null) els.wMin.textContent = `↓ ${Math.round(j.min)}°C`;
       if (els.wMax && j.max != null) els.wMax.textContent = `↑ ${Math.round(j.max)}°C`;
 
@@ -1031,10 +1038,15 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(loadWeather, 25 * 60 * 1000);
 
   // Estágio
-  setEstagio(1, { persist: true });
-  // opcional: comenta pra nunca mais buscar do backend
-  // loadCorEstagio();
-  // setInterval(loadCorEstagio, 25 * 60 * 1000);
+  const savedStage = Number(localStorage.getItem(STAGE_STORAGE_KEY) || 1);
+  setEstagio(savedStage, { persist: false });
+  loadCorEstagio();
+  setInterval(loadCorEstagio, 25 * 60 * 1000);
+setEstagio(1, { persist: true });
+
+// opcional: comenta pra nunca mais buscar do backend
+// loadCorEstagio();
+// setInterval(loadCorEstagio, 25 * 60 * 1000);
 
   // Maps
   initGoogleMapIfPossible();
@@ -1048,6 +1060,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("keydown", (e) => {
     const isShortcut = e.ctrlKey && e.shiftKey && (e.key === "k" || e.key === "K");
     if (!isShortcut) return;
+
     e.preventDefault();
 
     const panel = document.querySelector(".keywordsPanel");
