@@ -978,50 +978,73 @@ document.addEventListener("DOMContentLoaded", () => {
     return "☁️";
   }
 
-  async function loadWeather() {
-    try {
-      const res = await fetch(`${API_BASE}/weather`, { cache: "no-store" });
-      if (!res.ok) {
-        const t = await res.text().catch(() => "");
-        throw new Error(`Falha no /weather HTTP ${res.status}: ${t.slice(0, 150)}`);
-      }
+  function codeToCondPt(code) {
+  // mapeamento simples WMO
+  if (code === 0) return "Sol";
+  if ([1, 2].includes(code)) return "Parcialmente nublado";
+  if (code === 3) return "Nublado";
+  if ([45, 48].includes(code)) return "Neblina";
+  if ([51,53,55,56,57].includes(code)) return "Garoa";
+  if ([61,63,65,66,67].includes(code)) return "Chuva";
+  if ([71,73,75,77].includes(code)) return "Neve";
+  if ([80,81,82].includes(code)) return "Pancadas";
+  if ([95,96,99].includes(code)) return "Tempestade";
+  return "—";
+}
 
-      const j = await res.json();
-      if (!j?.ok) throw new Error(j?.error || "Resposta inválida do /weather");
+async function loadWeather() {
+  try {
+    // usa o mesmo ponto do teu MAPS.center (ou do WX_DEFAULT)
+    const lat = -22.8749;
+    const lon = -43.3096;
 
-      if (els.wPlace) els.wPlace.textContent = j.place || "Água Santa • RJ";
-      if (els.wCond) els.wCond.textContent = j.cond || "—";
+    const url =
+      `https://api.open-meteo.com/v1/forecast` +
+      `?latitude=${lat}&longitude=${lon}` +
+      `&current=weather_code` +
+      `&daily=temperature_2m_min,temperature_2m_max` +
+      `&forecast_days=1` +
+      `&timezone=America%2FSao_Paulo`;
 
-      if (els.wDay) els.wDay.textContent = "HOJE";
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Open-Meteo HTTP ${res.status}`);
 
-      if (els.wMin && j.min != null) els.wMin.textContent = `↓ ${Math.round(j.min)}°C`;
-      if (els.wMax && j.max != null) els.wMax.textContent = `↑ ${Math.round(j.max)}°C`;
+    const j = await res.json();
 
-      // emoji do clima: pega o 2º .wmEmoji dentro do weatherMini (o 1º é o quadradinho azul)
-      const emojiSpans = els.weatherMini?.querySelectorAll(".wmEmoji");
-      if (emojiSpans && emojiSpans.length >= 2) {
-        emojiSpans[1].textContent = condToEmoji(j.cond);
-      }
+    const code = j?.current?.weather_code;
+    const cond = codeToCondPt(code);
 
-      // NÃO usar mais o número grandão (27° antigo)
-      if (els.wTemp) els.wTemp.textContent = "";
+    const min = j?.daily?.temperature_2m_min?.[0];
+    const max = j?.daily?.temperature_2m_max?.[0];
 
-      if (els.wUpdated) {
-        els.wUpdated.textContent = new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
-      }
-    } catch (e) {
-      console.warn("[weather]", e?.message || e);
+    if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ";
+    if (els.wCond) els.wCond.textContent = cond || "—";
+    if (els.wDay) els.wDay.textContent = "HOJE";
 
-      if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ";
-      if (els.wCond) els.wCond.textContent = "—";
-      if (els.wMin) els.wMin.textContent = "--°C";
-      if (els.wMax) els.wMax.textContent = "--°C";
-      if (els.wDay) els.wDay.textContent = "HOJE";
-      if (els.wTemp) els.wTemp.textContent = "";
-      if (els.wUpdated) els.wUpdated.textContent = "—";
+    if (els.wMin && min != null) els.wMin.textContent = `↓ ${Math.round(min)}°C`;
+    if (els.wMax && max != null) els.wMax.textContent = `↑ ${Math.round(max)}°C`;
+
+    const emojiSpans = els.weatherMini?.querySelectorAll(".wmEmoji");
+    if (emojiSpans && emojiSpans.length >= 2) {
+      emojiSpans[1].textContent = condToEmoji(cond);
     }
-  }
 
+    if (els.wTemp) els.wTemp.textContent = "";
+    if (els.wUpdated) {
+      els.wUpdated.textContent = new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
+    }
+  } catch (e) {
+    console.warn("[weather-front]", e?.message || e);
+
+    if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ";
+    if (els.wCond) els.wCond.textContent = "—";
+    if (els.wMin) els.wMin.textContent = "--°C";
+    if (els.wMax) els.wMax.textContent = "--°C";
+    if (els.wDay) els.wDay.textContent = "HOJE";
+    if (els.wTemp) els.wTemp.textContent = "";
+    if (els.wUpdated) els.wUpdated.textContent = "—";
+  }
+}
   // ============================
   // Init
   // ============================
