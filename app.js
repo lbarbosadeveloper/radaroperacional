@@ -63,18 +63,21 @@ const API_BASE =
     : PROD_API;
 
 // ============================
-// ✅ GOOGLE MAPS (Dark) — apenas front
+// ✅ GOOGLE MAPS (3D Satélite + Trânsito) — front
 // ============================
 const MAPS = {
   enabled: true,
   elementId: "map",
   center: { lat: -22.8749, lng: -43.3096 },
-  zoom: 14,
+  zoom: 18,        // ✅ tilt funciona melhor em zoom alto
+  heading: 25,     // ✅ rotação (ajuste ao gosto)
+  tilt: 45,        // ✅ inclinação
 };
 
 let __gmapsLoaded = false;
 let __gmapsLoading = null;
 let __mapInstance = null;
+let __trafficLayer = null;
 
 function getGoogleMapsKey() {
   const meta = document.querySelector('meta[name="google-maps-key"]');
@@ -109,6 +112,7 @@ function loadGoogleMapsScript(key) {
   return __gmapsLoading;
 }
 
+// (mantive seu style, mas no satélite ele quase não influencia; deixei por compatibilidade)
 function getDarkMapStyle() {
   return [
     { elementType: "geometry", stylers: [{ color: "#0b1220" }] },
@@ -158,6 +162,9 @@ async function initGoogleMapIfPossible() {
     __mapInstance = new google.maps.Map(el, {
       center: MAPS.center,
       zoom: MAPS.zoom,
+      mapTypeId: "satellite", // ✅ satélite (pra ficar tipo a imagem)
+      tilt: MAPS.tilt,        // ✅ inclinação
+      heading: MAPS.heading,  // ✅ rotação
       styles: getDarkMapStyle(),
       disableDefaultUI: true,
       zoomControl: true,
@@ -165,13 +172,20 @@ async function initGoogleMapIfPossible() {
       clickableIcons: false,
     });
 
+    // ✅ Trânsito
     // eslint-disable-next-line no-undef
-    new google.maps.Marker({
-      position: MAPS.center,
-      map: __mapInstance,
-      title: "Centro",
-    });
+    __trafficLayer = new google.maps.TrafficLayer();
+    __trafficLayer.setMap(__mapInstance);
   }
+
+  // Força o tilt e heading depois que o mapa estabilizar (ajuda a “não voltar reto”)
+  // eslint-disable-next-line no-undef
+  google.maps.event.addListenerOnce(__mapInstance, "idle", () => {
+    try {
+      __mapInstance.setTilt(MAPS.tilt);
+      __mapInstance.setHeading(MAPS.heading);
+    } catch {}
+  });
 
   setTimeout(() => {
     try {
@@ -314,22 +328,18 @@ function uniquePush(list, item) {
   return true;
 }
 
-// ✅ NOVO: força "busca por frase" quando o termo tiver espaço
+// ✅ força "busca por frase" quando o termo tiver espaço
 function formatSearchQuery(raw) {
   const q = normalizeKw(raw);
   if (!q) return "";
 
-  // se o usuário já colocou aspas, respeita
   const alreadyQuoted =
     (q.startsWith('"') && q.endsWith('"')) ||
     (q.startsWith("“") && q.endsWith("”")) ||
     (q.startsWith("'") && q.endsWith("'"));
 
   if (alreadyQuoted) return q;
-
-  // se tiver espaço => frase exata
   if (q.includes(" ")) return `"${q}"`;
-
   return q;
 }
 
@@ -442,18 +452,6 @@ function setupInfiniteMarquee({ speedPxPerSec = 55, minCards = 24 } = {}) {
     });
     viewport.dataset.hoverPauseBound = "1";
   }
-}
-
-// ============================
-// ===== Refresh automático do Waze (Live reforçado) =====
-// ============================
-function refreshWazeIframe() {
-  const iframe = document.querySelector(".mapEl");
-  if (!iframe) return;
-
-  const url = new URL(iframe.src);
-  url.searchParams.set("_t", String(Date.now())); // evita cache
-  iframe.src = url.toString();
 }
 
 // ============================
@@ -786,9 +784,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ============================
-  // ✅ FIX: busca robusta
-  // - sem "date=hoje" (porque você já filtra no front com MAX_AGE_HOURS)
-  // - sites em lotes para não estourar query
+  // ✅ busca robusta
   // ============================
   function chunkArray(arr, size) {
     const out = [];
@@ -797,12 +793,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function searchWeb(keyword) {
-    const chunkSize = 8; // 6~10 é um bom range
+    const chunkSize = 8;
     const siteChunks = SITE_FILTER.length ? chunkArray(SITE_FILTER, chunkSize) : [[]];
 
     const all = [];
-
-    // ✅ AQUI: força frase exata quando tiver espaço
     const query = formatSearchQuery(keyword);
 
     for (const chunk of siteChunks) {
@@ -813,7 +807,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!res.ok) {
         const txt = await res.text().catch(() => "");
         console.warn("Falha /search:", res.status, txt.slice(0, 200), "URL:", url);
-        continue; // não derruba tudo por causa de 1 lote
+        continue;
       }
 
       const data = await res.json();
@@ -821,7 +815,6 @@ document.addEventListener("DOMContentLoaded", () => {
       all.push(...results);
     }
 
-    // remove duplicados (por url/link)
     const uniq = new Map();
     for (const r of all) {
       const u = normalizeUrl(r?.url || r?.link || "");
@@ -963,7 +956,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ============================
-  // ✅ CLIMA (ClimaTempo via BACKEND /weather)
+  // ✅ CLIMA (Open-Meteo no front)
   // ============================
   function condToEmoji(text) {
     const t = String(text || "").toLowerCase();
@@ -979,72 +972,71 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function codeToCondPt(code) {
-  // mapeamento simples WMO
-  if (code === 0) return "Sol";
-  if ([1, 2].includes(code)) return "Parcialmente nublado";
-  if (code === 3) return "Nublado";
-  if ([45, 48].includes(code)) return "Neblina";
-  if ([51,53,55,56,57].includes(code)) return "Garoa";
-  if ([61,63,65,66,67].includes(code)) return "Chuva";
-  if ([71,73,75,77].includes(code)) return "Neve";
-  if ([80,81,82].includes(code)) return "Pancadas";
-  if ([95,96,99].includes(code)) return "Tempestade";
-  return "—";
-}
-
-async function loadWeather() {
-  try {
-    // usa o mesmo ponto do teu MAPS.center (ou do WX_DEFAULT)
-    const lat = -22.8749;
-    const lon = -43.3096;
-
-    const url =
-      `https://api.open-meteo.com/v1/forecast` +
-      `?latitude=${lat}&longitude=${lon}` +
-      `&current=weather_code` +
-      `&daily=temperature_2m_min,temperature_2m_max` +
-      `&forecast_days=1` +
-      `&timezone=America%2FSao_Paulo`;
-
-    const res = await fetch(url, { cache: "no-store" });
-    if (!res.ok) throw new Error(`Open-Meteo HTTP ${res.status}`);
-
-    const j = await res.json();
-
-    const code = j?.current?.weather_code;
-    const cond = codeToCondPt(code);
-
-    const min = j?.daily?.temperature_2m_min?.[0];
-    const max = j?.daily?.temperature_2m_max?.[0];
-
-    if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ";
-    if (els.wCond) els.wCond.textContent = cond || "—";
-    if (els.wDay) els.wDay.textContent = "HOJE";
-
-    if (els.wMin && min != null) els.wMin.textContent = `↓ ${Math.round(min)}°C`;
-    if (els.wMax && max != null) els.wMax.textContent = `↑ ${Math.round(max)}°C`;
-
-    const emojiSpans = els.weatherMini?.querySelectorAll(".wmEmoji");
-    if (emojiSpans && emojiSpans.length >= 2) {
-      emojiSpans[1].textContent = condToEmoji(cond);
-    }
-
-    if (els.wTemp) els.wTemp.textContent = "";
-    if (els.wUpdated) {
-      els.wUpdated.textContent = new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
-    }
-  } catch (e) {
-    console.warn("[weather-front]", e?.message || e);
-
-    if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ";
-    if (els.wCond) els.wCond.textContent = "—";
-    if (els.wMin) els.wMin.textContent = "--°C";
-    if (els.wMax) els.wMax.textContent = "--°C";
-    if (els.wDay) els.wDay.textContent = "HOJE";
-    if (els.wTemp) els.wTemp.textContent = "";
-    if (els.wUpdated) els.wUpdated.textContent = "—";
+    if (code === 0) return "Sol";
+    if ([1, 2].includes(code)) return "Parcialmente nublado";
+    if (code === 3) return "Nublado";
+    if ([45, 48].includes(code)) return "Neblina";
+    if ([51, 53, 55, 56, 57].includes(code)) return "Garoa";
+    if ([61, 63, 65, 66, 67].includes(code)) return "Chuva";
+    if ([71, 73, 75, 77].includes(code)) return "Neve";
+    if ([80, 81, 82].includes(code)) return "Pancadas";
+    if ([95, 96, 99].includes(code)) return "Tempestade";
+    return "—";
   }
-}
+
+  async function loadWeather() {
+    try {
+      const lat = -22.8749;
+      const lon = -43.3096;
+
+      const url =
+        `https://api.open-meteo.com/v1/forecast` +
+        `?latitude=${lat}&longitude=${lon}` +
+        `&current=weather_code` +
+        `&daily=temperature_2m_min,temperature_2m_max` +
+        `&forecast_days=1` +
+        `&timezone=America%2FSao_Paulo`;
+
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error(`Open-Meteo HTTP ${res.status}`);
+
+      const j = await res.json();
+
+      const code = j?.current?.weather_code;
+      const cond = codeToCondPt(code);
+
+      const min = j?.daily?.temperature_2m_min?.[0];
+      const max = j?.daily?.temperature_2m_max?.[0];
+
+      if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ";
+      if (els.wCond) els.wCond.textContent = cond || "—";
+      if (els.wDay) els.wDay.textContent = "HOJE";
+
+      if (els.wMin && min != null) els.wMin.textContent = `↓ ${Math.round(min)}°C`;
+      if (els.wMax && max != null) els.wMax.textContent = `↑ ${Math.round(max)}°C`;
+
+      const emojiSpans = els.weatherMini?.querySelectorAll(".wmEmoji");
+      if (emojiSpans && emojiSpans.length >= 2) {
+        emojiSpans[1].textContent = condToEmoji(cond);
+      }
+
+      if (els.wTemp) els.wTemp.textContent = "";
+      if (els.wUpdated) {
+        els.wUpdated.textContent = new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" });
+      }
+    } catch (e) {
+      console.warn("[weather-front]", e?.message || e);
+
+      if (els.wPlace) els.wPlace.textContent = "Água Santa • RJ";
+      if (els.wCond) els.wCond.textContent = "—";
+      if (els.wMin) els.wMin.textContent = "--°C";
+      if (els.wMax) els.wMax.textContent = "--°C";
+      if (els.wDay) els.wDay.textContent = "HOJE";
+      if (els.wTemp) els.wTemp.textContent = "";
+      if (els.wUpdated) els.wUpdated.textContent = "—";
+    }
+  }
+
   // ============================
   // Init
   // ============================
@@ -1052,30 +1044,20 @@ async function loadWeather() {
   renderResults();
   setStatus("idle");
 
-  // Waze refresh
-  setTimeout(refreshWazeIframe, 2000);
-  setInterval(refreshWazeIframe, 1 * 60 * 1000);
-
-  // Clima
+  // ✅ Clima
   loadWeather();
   setInterval(loadWeather, 25 * 60 * 1000);
 
-  // Estágio
+  // ✅ Estágio
   const savedStage = Number(localStorage.getItem(STAGE_STORAGE_KEY) || 1);
   setEstagio(savedStage, { persist: false });
-  //loadCorEstagio();
-  //setInterval(loadCorEstagio, 25 * 60 * 1000);
-setEstagio(1, { persist: true });
+  setEstagio(1, { persist: true });
 
-// opcional: comenta pra nunca mais buscar do backend
-// loadCorEstagio();
-// setInterval(loadCorEstagio, 25 * 60 * 1000);
-
-  // Maps
+  // ✅ Maps
   initGoogleMapIfPossible();
   setTimeout(initGoogleMapIfPossible, 1000);
 
-  // Notícias
+  // ✅ Notícias
   runScan();
   setInterval(runScan, 25 * 60 * 1000);
 
