@@ -5,10 +5,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Radar Operacional Lamsa</title>
-
-  <!-- ✅ COLE SUA API KEY AQUI -->
-  <meta name="google-maps-key" content="AIzaSyCEdbjFRyoiVkdjHmS3gkBuatoiGuGP_Ps" />
-
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -80,58 +76,68 @@
           </section>
         </section>
 
-        <!-- CLIMA -->
-        <section class="panel weatherPanel">
-          <div class="panelHead">
-            <h2>Clima</h2>
-          </div>
+<!-- CLIMA -->
+<!-- CLIMA -->
+<section class="panel weatherPanel">
+  <div class="panelHead">
+    <h2>Clima</h2>
+  </div>
 
-          <div class="weather">
-            <!-- Linha única -->
-            <div class="weatherTopLine">
-              <span class="wCity" id="wPlace">Carregando...</span>
-              <span class="wSep">•</span>
-              <span class="wCond" id="wCond">—</span>
+  <div class="weather">
+    <!-- Linha única -->
+    <div class="weatherTopLine">
+      <span class="wCity" id="wPlace">Carregando...</span>
+      <span class="wSep">•</span>
+      <span class="wCond" id="wCond">—</span>
 
-              <div class="weatherMini" id="weatherMini">
-                <span class="wmEmoji" aria-hidden="true">🌡️</span>
-                <span class="wmDay" id="wDay">HOJE</span>
-                <span class="wmEmoji" aria-hidden="true">☁️</span>
-                <span class="wmMin" id="wMin">--°C</span>
-                <span class="wmMax" id="wMax">--°C</span>
-              </div>
-            </div>
+      <div class="weatherMini" id="weatherMini">
+        <span class="wmEmoji" aria-hidden="true">🌡️</span>
+        <span class="wmDay" id="wDay">HOJE</span>
+        <span class="wmEmoji" aria-hidden="true">☁️</span>
+        <span class="wmMin" id="wMin">--°C</span>
+        <span class="wmMax" id="wMax">--°C</span>
+      </div>
+    </div>
 
-            <!-- ✅ ESTÁGIO + TEXTO -->
-            <div class="stageRow">
-              <div class="stageWrapper">
-                <img id="stageBadge" class="stageBadge" src="./assets/estagio-2.png" alt="Estágio operacional">
-              </div>
+    <!-- ✅ ESTÁGIO + TEXTO -->
+    <div class="stageRow">
+      <div class="stageWrapper">
+        <img id="stageBadge" class="stageBadge" src="./assets/estagio-2.png" alt="Estágio operacional">
+      </div>
 
-              <div class="stageInfo">
-                <div class="stageInfoTitle">Quando:</div>
-                <div id="stageInfoText" class="stageInfoText">—</div>
-              </div>
-            </div>
+      <div class="stageInfo">
+        <div class="stageInfoTitle">Quando:</div>
+        <div id="stageInfoText" class="stageInfoText">—</div>
+      </div>
+    </div>
 
-            <!-- RÉGUA DOS ESTÁGIOS (1–5) -->
-            <div class="stageDots" id="stageDots">
-              <button class="dot active" data-stage="1" aria-label="Estágio 1">1</button>
-              <button class="dot" data-stage="2" aria-label="Estágio 2">2</button>
-              <button class="dot" data-stage="3" aria-label="Estágio 3">3</button>
-              <button class="dot" data-stage="4" aria-label="Estágio 4">4</button>
-              <button class="dot" data-stage="5" aria-label="Estágio 5">5</button>
-            </div>
-          </div>
-        </section>
+    <!-- RÉGUA DOS ESTÁGIOS (1–5) -->
+    <div class="stageDots" id="stageDots">
+      <button class="dot active" data-stage="1" aria-label="Estágio 1">1</button>
+      <button class="dot" data-stage="2" aria-label="Estágio 2">2</button>
+      <button class="dot" data-stage="3" aria-label="Estágio 3">3</button>
+      <button class="dot" data-stage="4" aria-label="Estágio 4">4</button>
+      <button class="dot" data-stage="5" aria-label="Estágio 5">5</button>
+    </div>
+  </div>
+</section>
 
-        <!-- ✅ MAPA (GOOGLE MAPS 3D SATÉLITE + TRÂNSITO) -->
+        <!-- ✅ MAPA (WAZE LIVE MAP - COM TRÂNSITO) -->
         <section class="panel mapPanel">
           <div class="panelHead"></div>
 
           <div class="mapWrap">
-            <!-- ✅ IMPORTANTE: precisa do ID "map" -->
-            <div class="mapEl" id="map" aria-label="Google Maps"></div>
+            <iframe
+              class="mapEl"
+              title="Mapa Waze - Trânsito"
+              src="https://embed.waze.com/iframe?zoom=15&lat=-22.907054&lon=-43.308952&ct=livemap"
+              width="100%"
+              height="100%"
+              style="border:0; filter: invert(1) hue-rotate(180deg) contrast(1.05) saturate(0.95);"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              allowfullscreen
+            ></iframe>
           </div>
         </section>
 
