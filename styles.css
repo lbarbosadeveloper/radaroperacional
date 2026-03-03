@@ -143,11 +143,10 @@ body.kw-open .topRow{
    MAPA (Waze / iframe)
 ========================= */
 .mapPanel{
-  padding:0px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  padding-top: 0;
+  padding: 0;              /* zera tudo (cima, lados, baixo) */
+  display: flex;
+  flex-direction: column;
+  gap: 0;                  /* tira o espaço entre panelHead e mapWrap */
 }
 
 .mapWrap{
@@ -1078,6 +1077,7 @@ body.kw-open .topRow{
   font-size: 15px;
   font-weight: 600;
 }
+
 
 
 
