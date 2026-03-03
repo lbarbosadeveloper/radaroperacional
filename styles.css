@@ -1078,19 +1078,6 @@ body.kw-open .topRow{
   font-weight: 600;
 }
 
-.mapWrap {
-  border-radius: 18px;
-  overflow: hidden;
-}
-
-.mapWrap iframe {
-  width: 100%;
-  height: 100%;
-  border: 0;
-
-  transform: rotate(-6deg) scale(1.08);
-  transform-origin: center;
-}
 
 
 
