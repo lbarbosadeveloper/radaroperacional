@@ -7,7 +7,7 @@
   --text: rgba(235,245,255,.92);
   --muted: rgba(235,245,255,.55);
 
-  /* (opcional) usado se você quiser glow por estágio */
+
   --stageRGB: 241,196,15;
 }
 
@@ -813,7 +813,7 @@ body.kw-open .topRow{
 /* Deixa a “caixa” do clima mais fina (sem mexer no resto do painel) */
 .weatherPanel .weatherTop{
   padding: 10px 12px;     /* era maior; reduz */
-  min-height: 56px;       /* opcional: deixa mais baixinho */
+  min-height: 200px;       /* opcional: deixa mais baixinho */
   gap: 12px;              /* se tiver gap grande, reduz */
 }
 
