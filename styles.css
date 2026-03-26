@@ -1061,14 +1061,14 @@ body.kw-open .topRow{
 
 /* Aumentar o badge HOJE ↓ ↑ */
 .weatherMini{
-  font-size: 5px;      /* era menor */
+  font-size: 15px;      /* era menor */
   padding: 8px 12px;    /* dá “corpo” */
   gap: 8px;             /* espaçamento entre itens */
   border-radius: 10px;
 }
 
 .weatherMini .wmEmoji{
-  font-size: 16px;      /* aumenta o ícone */
+  font-size: 20px;      /* aumenta o ícone */
 }
 
 .weatherMini .wmDay,
