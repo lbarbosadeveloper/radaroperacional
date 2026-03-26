@@ -1061,7 +1061,7 @@ body.kw-open .topRow{
 
 /* Aumentar o badge HOJE ↓ ↑ */
 .weatherMini{
-  font-size: 50px;      /* era menor */
+  font-size: 5px;      /* era menor */
   padding: 8px 12px;    /* dá “corpo” */
   gap: 8px;             /* espaçamento entre itens */
   border-radius: 10px;
