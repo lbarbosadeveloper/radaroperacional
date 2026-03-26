@@ -987,7 +987,7 @@ body.kw-open .topRow{
 .weatherPanel .wCity,
 .weatherPanel .wCond{
   font-weight: 700;
-  font-size: 13px;
+  font-size: 16px;
   color: rgba(235,245,255,.92);
   white-space: nowrap;
 }
