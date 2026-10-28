@@ -53,6 +53,29 @@ public final class ShortcutCodec {
 		return "https://" + u;
 	}
 
+	/** Devolve uma cópia da lista com o item em {@code index} movido {@code delta} posições (−1 sobe, +1 desce). */
+	public static List<Shortcut> move(List<Shortcut> list, int index, int delta) {
+		List<Shortcut> copy = new ArrayList<>(list);
+		int target = index + delta;
+		if (index < 0 || index >= copy.size() || target < 0 || target >= copy.size()) return copy;
+		Shortcut item = copy.remove(index);
+		copy.add(target, item);
+		return copy;
+	}
+
+	/** Só o nome do servidor de um endereço: "https://m.youtube.com/x" vira "m.youtube.com". */
+	public static String domainOf(String url) {
+		String u = normalizeUrl(url);
+		if (u.isEmpty()) return "";
+		int start = u.indexOf("://") + 3;
+		int end = u.length();
+		for (char c : new char[]{'/', '?', '#', ':'}) {
+			int i = u.indexOf(c, start);
+			if (i >= 0 && i < end) end = i;
+		}
+		return u.substring(start, end).toLowerCase(Locale.ROOT);
+	}
+
 	private static String clean(String s) {
 		if (s == null) return "";
 		return s.replace('\t', ' ').replace('\r', ' ').replace('\n', ' ').trim();

@@ -61,6 +61,33 @@ public class ShortcutCodecTest {
 	}
 
 	@Test
+	public void moveUpSwapsWithPrevious() {
+		List<Shortcut> list = Arrays.asList(new Shortcut("A", "a"), new Shortcut("B", "b"), new Shortcut("C", "c"));
+
+		List<Shortcut> moved = ShortcutCodec.move(list, 2, -1);
+
+		assertEquals(Arrays.asList(new Shortcut("A", "a"), new Shortcut("C", "c"), new Shortcut("B", "b")), moved);
+		assertEquals("lista original não muda", "C", list.get(2).name);
+	}
+
+	@Test
+	public void moveOutOfBoundsKeepsOrder() {
+		List<Shortcut> list = Arrays.asList(new Shortcut("A", "a"), new Shortcut("B", "b"));
+
+		assertEquals(list, ShortcutCodec.move(list, 0, -1));
+		assertEquals(list, ShortcutCodec.move(list, 1, +1));
+		assertEquals(list, ShortcutCodec.move(list, 5, -1));
+	}
+
+	@Test
+	public void domainOfExtractsHost() {
+		assertEquals("m.youtube.com", ShortcutCodec.domainOf("https://m.youtube.com/watch?v=1"));
+		assertEquals("globoplay.globo.com", ShortcutCodec.domainOf("globoplay.globo.com"));
+		assertEquals("192.168.0.10", ShortcutCodec.domainOf("http://192.168.0.10:8080/x"));
+		assertEquals("", ShortcutCodec.domainOf(""));
+	}
+
+	@Test
 	public void defaultsContainYouTubeFirst() {
 		List<Shortcut> defaults = ShortcutCodec.defaults();
 

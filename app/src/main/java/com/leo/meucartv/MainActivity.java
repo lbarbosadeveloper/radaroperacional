@@ -1,8 +1,10 @@
 package com.leo.meucartv;
 
 import android.app.Activity;
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -15,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,7 +50,22 @@ public class MainActivity extends Activity {
 		actions.setPadding(0, dp(16), 0, dp(8));
 		actions.addView(button("+ Adicionar", v -> editDialog(-1)));
 		actions.addView(button("Prévia da tela", v -> startActivity(new Intent(this, PreviewActivity.class))));
+		actions.addView(button("Como ativar", v -> showSetupGuide()));
 		root.addView(actions);
+
+		AppPrefs prefs = new AppPrefs(this);
+		Switch lock = new Switch(this);
+		lock.setText("Pausar vídeo com o carro em movimento");
+		lock.setTextColor(Color.WHITE);
+		lock.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+		lock.setChecked(prefs.isMotionLockEnabled());
+		lock.setPadding(0, dp(4), 0, dp(8));
+		lock.setOnCheckedChangeListener((b, on) -> {
+			prefs.setMotionLockEnabled(on);
+			if (on) requestSpeedPermissions();
+		});
+		root.addView(lock);
+		if (prefs.isMotionLockEnabled()) requestSpeedPermissions();
 
 		list = new LinearLayout(this);
 		list.setOrientation(LinearLayout.VERTICAL);
@@ -85,22 +103,66 @@ public class MainActivity extends Activity {
 			final int index = i;
 			Shortcut s = shortcuts.get(i);
 			LinearLayout row = new LinearLayout(this);
-			row.setOrientation(LinearLayout.VERTICAL);
-			row.setPadding(dp(16), dp(12), dp(16), dp(12));
+			row.setOrientation(LinearLayout.HORIZONTAL);
+			row.setGravity(Gravity.CENTER_VERTICAL);
+			row.setPadding(dp(16), dp(10), dp(8), dp(10));
 			GradientDrawable bg = new GradientDrawable();
 			bg.setColor(Color.parseColor("#1C222B"));
 			bg.setCornerRadius(dp(12));
 			row.setBackground(bg);
+
+			LinearLayout info = new LinearLayout(this);
+			info.setOrientation(LinearLayout.VERTICAL);
 			TextView name = text(s.name, 18, Color.WHITE);
 			name.setTypeface(Typeface.DEFAULT_BOLD);
-			row.addView(name);
-			row.addView(text(s.url, 13, Color.GRAY));
+			info.addView(name);
+			info.addView(text(s.url, 13, Color.GRAY));
+			row.addView(info, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
+			row.addView(arrow("↑", index > 0, v -> moveShortcut(index, -1)));
+			row.addView(arrow("↓", index < shortcuts.size() - 1, v -> moveShortcut(index, +1)));
 			row.setOnClickListener(v -> editDialog(index));
 			LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
 					ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
 			lp.setMargins(0, dp(6), 0, dp(6));
 			list.addView(row, lp);
 		}
+	}
+
+	private void moveShortcut(int index, int delta) {
+		store.save(ShortcutCodec.move(store.load(), index, delta));
+		refresh();
+	}
+
+	private TextView arrow(String label, boolean enabled, android.view.View.OnClickListener click) {
+		TextView t = text(label, 24, enabled ? Color.WHITE : Color.DKGRAY);
+		t.setGravity(Gravity.CENTER);
+		t.setMinWidth(dp(44));
+		t.setPadding(dp(8), dp(4), dp(8), dp(4));
+		if (enabled) t.setOnClickListener(click);
+		return t;
+	}
+
+	/** Velocidade do carro (Android Auto) e GPS, para o bloqueio em movimento. */
+	private void requestSpeedPermissions() {
+		List<String> missing = new ArrayList<>();
+		for (String p : new String[]{"com.google.android.gms.permission.CAR_SPEED",
+				Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}) {
+			if (checkSelfPermission(p) != PackageManager.PERMISSION_GRANTED) missing.add(p);
+		}
+		if (!missing.isEmpty()) requestPermissions(missing.toArray(new String[0]), 1);
+	}
+
+	private void showSetupGuide() {
+		new AlertDialog.Builder(this)
+				.setTitle("Como ativar no carro")
+				.setMessage("1. Abra as configurações do Android Auto no celular "
+						+ "(Configurações > Dispositivos conectados > Android Auto).\n\n"
+						+ "2. Role até o fim e toque 10 vezes em \"Versão\" até liberar o modo desenvolvedor.\n\n"
+						+ "3. Toque nos três pontinhos ⋮ > Configurações do desenvolvedor > marque \"Fontes desconhecidas\".\n\n"
+						+ "4. Em \"Personalizar acesso rápido\", confira se o Meu CarTV está marcado.\n\n"
+						+ "5. Plugue no carro e abra o Meu CarTV na tela. Assista só com o carro parado.")
+				.setPositiveButton("Entendi", null)
+				.show();
 	}
 
 	/** index = -1 adiciona um atalho novo; senão edita o existente. */

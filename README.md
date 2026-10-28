@@ -16,18 +16,32 @@ O arquivo `MeuCarTV.apk` fica na página **Releases** do repositório, pronta pa
    menu (⋮) → **Configurações do desenvolvedor** → marque **Fontes desconhecidas**.
 4. Plugue no carro e procure o **Meu CarTV** na tela do Android Auto.
 
+## Recursos
+
+- Grade de atalhos com o ícone de cada site, editável e reordenável no app do celular.
+- Busca na tela do carro com o teclado do Android Auto: pesquisa direto no YouTube ou abre um site/busca no Google.
+- "Continuar": volta para a última página assistida.
+- Navegador com Início, Voltar, Recarregar e um botão para forçar o vídeo em tela cheia.
+- Bloqueio com o carro em movimento: pausa o vídeo acima de 10 km/h e libera após 5 s parado.
+  Usa a velocidade do carro pelo Android Auto e, se o carro não informar, o GPS do celular.
+  Pode ser desligado no app do celular.
+- Tela sempre acesa enquanto o app está aberto e página amigável quando falta internet.
+
 ## Limitações conhecidas
 
 - Netflix e Globoplay usam proteção contra cópia (DRM) e podem não reproduzir no navegador embutido. YouTube funciona.
 - A integração com o Android Auto usa um SDK não oficial (`app/libs/aauto.aar`), o mesmo usado pelo projeto
   [Fermata Auto](https://github.com/AndreyPavlenko/Fermata). O Google não documenta esse caminho e pode mudar o
   Android Auto a qualquer momento.
-- Não há teclado na tela do carro: os atalhos são editados no app do celular.
-- Ainda não há bloqueio automático com o carro em movimento. Assista só parado.
+- Alguns carros desativam o teclado da tela com o carro andando (regra do próprio Android Auto).
+- Se nem o carro nem o GPS informarem a velocidade, o bloqueio em movimento não funciona: assista só parado.
 
 ## Estrutura
 
-- `ShortcutCodec` / `Shortcut`: lista de atalhos e normalização de endereços (com testes em `app/src/test`).
+- `ShortcutCodec` / `Shortcut`: lista de atalhos, reordenação e endereços (com testes em `app/src/test`).
+- `SpeedGate`: regra do bloqueio em movimento (com testes). `CarSpeedSource` / `GpsSpeedSource`: fontes de velocidade.
+- `SearchUrls`: transforma o texto digitado em busca ou endereço (com testes).
+- `CarEditText`: campo que usa o teclado da tela do carro.
 - `ShortcutStore`: salva os atalhos no celular.
 - `TvView`: a tela (grade de atalhos + navegador + tela cheia), usada no carro e na prévia.
 - `CarService` / `MainCarActivity`: entrada do Android Auto.
