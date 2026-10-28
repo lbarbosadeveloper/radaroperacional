@@ -14,7 +14,8 @@ O arquivo `MeuCarTV.apk` fica na página **Releases** do repositório, pronta pa
 2. Abra o app **Meu CarTV** no celular: edite os atalhos e use **Prévia da tela** para testar sem o carro.
 3. No Android Auto do celular: toque 10 vezes em **Versão** para liberar o modo desenvolvedor, depois
    menu (⋮) → **Configurações do desenvolvedor** → marque **Fontes desconhecidas**.
-4. Plugue no carro e procure o **Meu CarTV** na tela do Android Auto.
+4. Plugue no carro e procure, na lista de apps do Android Auto, o **Meu CarTV Tela** (modo navegação, tela cheia)
+   ou o **Meu CarTV**. O **Meu CarTV Áudio** só existe para ajudar o Android Auto a aceitar o app.
 
 ## Recursos
 
@@ -30,6 +31,8 @@ O arquivo `MeuCarTV.apk` fica na página **Releases** do repositório, pronta pa
 ## Limitações conhecidas
 
 - Netflix e Globoplay usam proteção contra cópia (DRM) e podem não reproduzir no navegador embutido. YouTube funciona.
+- Versões recentes do Android Auto escondem apps instalados fora da Play Store. O modo navegação e o
+  serviço de mídia são tentativas de contornar isso, sem garantia.
 - A integração com o Android Auto usa um SDK não oficial (`app/libs/aauto.aar`), o mesmo usado pelo projeto
   [Fermata Auto](https://github.com/AndreyPavlenko/Fermata). O Google não documenta esse caminho e pode mudar o
   Android Auto a qualquer momento.
@@ -44,7 +47,10 @@ O arquivo `MeuCarTV.apk` fica na página **Releases** do repositório, pronta pa
 - `CarEditText`: campo que usa o teclado da tela do carro.
 - `ShortcutStore`: salva os atalhos no celular.
 - `TvView`: a tela (grade de atalhos + navegador + tela cheia), usada no carro e na prévia.
-- `CarService` / `MainCarActivity`: entrada do Android Auto.
+- `CarService` / `MainCarActivity`: entrada do Android Auto (SDK não oficial).
+- `ScreenService` / `SurfaceTvScreen` / `SearchScreen`: modo navegação — desenha a TvView na superfície do carro
+  por uma tela virtual e repassa os toques; a busca usa o teclado do Android Auto.
+- `AudioService`: serviço de mídia mínimo para o app passar no filtro de Fontes desconhecidas.
 - `MainActivity` / `PreviewActivity`: telas do celular.
 
 O histórico anterior deste repositório (projeto Radar Operacional) continua disponível nos commits antigos.

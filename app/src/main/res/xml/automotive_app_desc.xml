@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Igual ao Fermata Auto: "media" ajuda o pacote a passar no filtro de Fontes desconhecidas. -->
 <automotiveApp xmlns:tools="http://schemas.android.com/tools">
+    <uses name="media" />
     <uses
         name="service"
         tools:ignore="InvalidUsesTagAttribute" />

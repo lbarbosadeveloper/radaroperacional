@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Meu CarTV</string>
+    <string name="screen_name">Meu CarTV Tela</string>
+    <string name="audio_name">Meu CarTV Áudio</string>
 </resources>

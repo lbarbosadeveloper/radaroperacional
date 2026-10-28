@@ -159,8 +159,9 @@ public class MainActivity extends Activity {
 						+ "(Configurações > Dispositivos conectados > Android Auto).\n\n"
 						+ "2. Role até o fim e toque 10 vezes em \"Versão\" até liberar o modo desenvolvedor.\n\n"
 						+ "3. Toque nos três pontinhos ⋮ > Configurações do desenvolvedor > marque \"Fontes desconhecidas\".\n\n"
-						+ "4. Em \"Personalizar acesso rápido\", confira se o Meu CarTV está marcado.\n\n"
-						+ "5. Plugue no carro e abra o Meu CarTV na tela. Assista só com o carro parado.")
+						+ "4. Em \"Personalizar acesso rápido\", marque o Meu CarTV Tela (e o Meu CarTV, se aparecer).\n\n"
+						+ "5. Plugue no carro e abra o Meu CarTV Tela. Para rolar a página, toque no botão de mover "
+						+ "(cruz) do Android Auto e arraste.")
 				.setPositiveButton("Entendi", null)
 				.show();
 	}

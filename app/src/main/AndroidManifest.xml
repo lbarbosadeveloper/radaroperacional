@@ -9,6 +9,9 @@
     <uses-permission android:name="com.google.android.gms.permission.CAR_SPEED" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!-- Modo navegação: receber a superfície de desenho do carro. -->
+    <uses-permission android:name="androidx.car.app.NAVIGATION_TEMPLATES" />
+    <uses-permission android:name="androidx.car.app.ACCESS_SURFACE" />
 
     <application
         android:allowBackup="true"
@@ -28,6 +31,10 @@
         <meta-data
             android:name="com.google.android.gms.car.notification.SmallIcon"
             android:resource="@drawable/ic_launcher" />
+        <meta-data
+            android:name="androidx.car.app.minCarApiLevel"
+            android:value="5"
+            tools:ignore="MetadataTagInsideApplicationTag" />
 
         <activity
             android:name=".MainActivity"
@@ -54,6 +61,31 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="com.google.android.gms.car.category.CATEGORY_PROJECTION" />
                 <category android:name="com.google.android.gms.car.category.CATEGORY_PROJECTION_OEM" />
+            </intent-filter>
+        </service>
+
+        <!-- Modo navegação (tela cheia), como o "FS Mirror" do Fermata. -->
+        <service
+            android:name=".ScreenService"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/screen_name"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="androidx.car.app.CarAppService" />
+                <category android:name="androidx.car.app.category.NAVIGATION" />
+            </intent-filter>
+        </service>
+
+        <!-- Serviço de mídia mínimo: ajuda o Android Auto a aceitar o app vindo de fora da Play Store. -->
+        <service
+            android:name=".AudioService"
+            android:exported="true"
+            android:icon="@drawable/ic_launcher"
+            android:label="@string/audio_name"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
         </service>
     </application>
