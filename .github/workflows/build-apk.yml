@@ -30,13 +30,23 @@ jobs:
         run: gradle --no-daemon testDebugUnitTest
 
       - name: Montar APK
+        shell: bash
         run: |
-          set -o pipefail
-          if ! gradle --no-daemon assembleDebug --stacktrace 2>&1 | tee build.log; then
+          set +e
+          gradle --no-daemon assembleDebug --stacktrace > build.log 2>&1
+          code=$?
+          tail -n 200 build.log
+          if [ $code -ne 0 ]; then
             # Devolve o trecho do erro como anotação, legível pela API do GitHub.
-            msg=$(grep -n -E "What went wrong|ERROR|error:|Exception|FAILED|> " build.log | head -60 | cut -c1-300)
-            msg="${msg//'%'/'%25'}"; msg="${msg//$'\n'/'%0A'}"
-            echo "::error title=Falha ao montar APK::$msg"
+            python3 - <<'PY'
+          import re
+          lines = open("build.log", encoding="utf-8", errors="replace").read().splitlines()
+          keys = re.compile(r"What went wrong|ERROR|[Ee]rror:|Exception|FAILED|[Ff]ailed|^> |Caused by")
+          hits = [l[:300] for l in lines if keys.search(l)][:60]
+          msg = "\n".join(hits) or "\n".join(lines[-40:])
+          msg = msg.replace("%", "%25").replace("\r", "").replace("\n", "%0A")
+          print("::error title=Falha ao montar APK::" + msg)
+          PY
             exit 1
           fi
 
