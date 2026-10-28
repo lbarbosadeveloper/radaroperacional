@@ -260,7 +260,7 @@ public class TvView extends FrameLayout {
 		column.addView(title);
 
 		TextView hint = new TextView(ctx);
-		hint.setText("Assista só com o carro parado. Edite os atalhos no app do celular.");
+		hint.setText("Edite os atalhos no app do celular.");
 		hint.setTextColor(Color.GRAY);
 		hint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
 		hint.setPadding(0, dp(2), 0, dp(12));

@@ -24,7 +24,7 @@ O arquivo `MeuCarTV.apk` fica na página **Releases** do repositório, pronta pa
 - Navegador com Início, Voltar, Recarregar e um botão para forçar o vídeo em tela cheia.
 - Bloqueio com o carro em movimento: pausa o vídeo acima de 10 km/h e libera após 5 s parado.
   Usa a velocidade do carro pelo Android Auto e, se o carro não informar, o GPS do celular.
-  Pode ser desligado no app do celular.
+  Vem desligado; dá para ligar no app do celular.
 - Tela sempre acesa enquanto o app está aberto e página amigável quando falta internet.
 
 ## Limitações conhecidas

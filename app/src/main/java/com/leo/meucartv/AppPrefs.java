@@ -17,7 +17,7 @@ public final class AppPrefs {
 	}
 
 	public boolean isMotionLockEnabled() {
-		return prefs.getBoolean(MOTION_LOCK, true);
+		return prefs.getBoolean(MOTION_LOCK, false);
 	}
 
 	public void setMotionLockEnabled(boolean enabled) {
